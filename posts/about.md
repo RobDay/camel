@@ -1,4 +1,3 @@
-@@ Title=About Page
-@@ Date=2014-05-01 18:08
+@@ Date=2014-08-07
 
-This is a sample about page, that can be accessed via `/about`.
+Hi everyone.  My name is Rob Day and I am an iOS developer based out of the NYC area.

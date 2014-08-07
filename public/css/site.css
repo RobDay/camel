@@ -1,0 +1,317 @@
+body
+{
+    background-color: #FFFFFF;
+    color: #303030;
+    line-height: 1.6;
+    font-size: 16pt;
+}
+
+a {
+	text-decoration: none;
+	color: rgb(0, 131, 255);
+}
+
+time {
+	color: rgb(171, 171, 171);
+}
+
+.content
+{
+    text-align: left;
+    max-width: 775px;
+    margin: 0  auto 2em auto;
+}
+
+.content ul {
+	padding-left: 0;
+}
+
+.content ul ul {/* Add a margin for any <ul> inside another <ul> */
+    margin-left: 1.5em;
+}
+
+.content ol {
+    padding-left: 0;
+}
+
+.container
+{
+    margin-bottom: 3em;
+    margin-left:1em;
+    margin-right:1em;
+
+}
+
+.content .header
+{
+    text-align: center;
+    border-bottom-style: solid;
+	border-bottom-color: rgb(228, 228, 228);
+	border-bottom-width: 0.3em;
+}
+
+.content .header .siteTitle
+{
+    font-size: 3.5em;
+    margin-bottom: 0.1em;
+    margin-top: -0.25em;
+}
+
+.content .header .siteTitle a
+{
+    text-decoration: none;
+}
+
+.content .header .siteTitle a:visited
+{
+    color: black;
+}
+
+.content .header nav
+{
+    text-transform: uppercase;
+	font-size: 0.85em;
+    color: rgb(228, 228, 228);
+    margin-bottom: 1em;
+}
+
+@media all and (max-width: 568px) {
+
+    .container {
+        margin-left:auto;
+        margin-right:auto;
+    }
+
+	.content {
+	    max-width:90%;
+	}
+
+    .content .main {
+        font-size: 18px;
+    }
+
+    .content .header .siteTitle {
+        font-size: 40px;
+    }
+    .content .header nav {
+        font-size: 14px;
+    }
+
+   .content .header {
+        margin-bottom:1em;
+    }
+
+   .content .header nav {
+        margin-bottom: 1em;
+    }
+
+   .content .header nav a {
+        margin: 0 .2em;
+        font-size: 14px;
+    }
+
+    .content ol {
+        margin-left: 0.25em;
+    }
+
+}
+
+.content code
+{
+    font-size: 0.9em;
+    background-color: #F0F0F0;
+}
+
+.copyright
+{
+    font-size: 0.6em;
+    text-align: center;
+}
+
+.center
+{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+}
+
+img
+{
+    max-width: 100%;
+}
+
+.header .dot
+{
+    font-weight: bold;
+    margin-left: 0.25em;
+}
+
+table.sortable thead {
+    cursor: default;
+}
+
+blockquote {
+    border-left: 4px solid rgb(228, 228, 228);
+    margin-left: 1em;
+    padding-left: 1em;
+}
+
+/* INDEX */
+
+.homepage .day .daybreak
+{
+    margin-top: 3em;
+    border: 0;
+    color: rgb(228, 228, 228);
+	background-color: rgb(228, 228, 228);
+	height: 0.15em;
+}
+
+.homepage .postHeader
+{
+    margin-top: 3em;
+    margin-bottom: 2em;
+}
+
+.homepage .postHeader .postTitle
+{
+    font-size: 2.2em;
+    font-weight: 500;
+    display: block;
+    line-height: 1.2;
+}
+
+.homepage .postHeader .postDate
+{
+    font-size: 0.9em;
+    display: block;
+}
+
+.homepage .day .article
+{
+    margin-bottom: 4em;
+}
+
+.homepage .copyright
+{
+    margin-top: -2em;
+}
+
+.homepage .article hr
+{
+    width: 35%;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.homepage .article th
+{
+    padding: 0 0.5em 0 0.5em
+}
+
+.homepage .article td
+{
+    padding: 0 0.5em 0 0.5em;
+}
+
+.homepage .paginationFooter
+{
+    width: 100%;
+    margin-top: 1em;
+}
+
+.homepage .paginationFooterPrevious
+{
+    display: inline;
+}
+
+.homepage .paginationFooterNext
+{
+    display: inline;
+    float: right;
+}
+
+/* POSTS */
+
+.post .postHeader
+{
+    text-align: center;
+    margin-bottom: 3em;
+}
+
+.post .postHeader .postTitle
+{
+    margin-top: 1em;
+    font-size: 2em;
+    display: block;
+    text-decoration: none;
+}
+
+.post .postHeader .postDate
+{
+    display: block;
+    font-size: 0.9em;
+}
+
+figure
+{
+    display: inline;
+    float: right;
+}
+
+figure figcaption
+{
+    text-align: center;
+    font-style: italic;
+}
+
+.post .postHeader .postTitle:visited
+{
+    color: black;
+}
+
+.post hr
+{
+    width: 50%;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+.post th
+{
+    padding: 0 0.5em 0 0.5em;
+}
+
+.post td
+{
+    padding: 0 0.5em 0 0.5em;
+}
+
+/* ABOUT */
+.headshot
+{
+    float: left;
+    display: inline;
+	width: 250px;
+    margin-right: 1em;
+}
+
+/* SHOWBOT */
+.showbot table
+{
+    /*text-align: center; Because Siracusa said I wasn't allowed. */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.showbot h2
+{
+    text-align: center;
+    text-decoration: underline;
+}
+
+.showbot .tables
+{
+    display: none;
+}
