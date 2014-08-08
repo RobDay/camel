@@ -52,7 +52,7 @@ time {
 {
     text-align: center;
     border-bottom-style: solid;
-	border-bottom-color: rgb(228, 228, 228);
+	border-bottom-color: #FFD5AF;
 	border-bottom-width: 0.3em;
 }
 
@@ -113,16 +113,18 @@ time {
         margin-bottom: 1em;
     }
 
-   .content .header nav a {
-        margin: 0 .2em;
-        font-size: 14px;
-    }
-
     .content ol {
         margin-left: 0.25em;
     }
 
 }
+
+.content nav a {
+     /*margin: 0 .2em;*/
+     font-size: 18px;
+     font-weight:400;
+     padding:5px;
+ }
 
 .content code
 {
