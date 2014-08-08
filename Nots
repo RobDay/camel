@@ -1,0 +1,47 @@
+Notes on how it works
+
+generateHtmlAndMetadataForFile takes a file
+    getLinesFromPost
+    parseMetadata
+    parseHtml
+    addRenderedPostToCache
+
+
+generateBodyHtmlForFile takes a file
+    getLinesFromPost
+    parseMetadata
+
+getLinesFromPost
+    Returns an object of bodyLines and MetadataLines
+
+
+parseMetadata
+    takes an array of lines
+    strips the metadata marker
+    creates a dictionary of metaData keys and values
+    merges metadata with global keys and values
+    returns result
+
+
+
+parseHtml
+    replaces all metadatakeys with their values in body and header
+    returns header + postHeader + body + footerSource;
+
+
+addRenderedPostToCache
+    caches:    metadata, body, and unwrappedbody.
+    
+
+
+generateMetadataForFile
+    wrapper on  generateHtmlAndMetadataForFile that just steals the metadata value
+
+generateHtmlForFile
+    wrapper on generateHtmlAndMetadataForFile that just steals the body value
+
+generateBodyHtmlForFile
+    processes a file and returned the marked parsed HTML
+
+externalFilenameForFile
+    enerate
