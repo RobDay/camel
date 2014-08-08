@@ -3,9 +3,9 @@ body
     background-color: #FFFFFF;
     color: #494746;
     line-height: 1.6;
-    font-size: 16pt;
+    font-size: 14pt;
     font-family: 'Whitney SSm A', 'Whitney SSm B';
-    font-weight: 300;
+    font-weight: 400;
     font-style: normal;
 }
 p {
@@ -14,7 +14,7 @@ p {
 
 a {
 	text-decoration: none;
-	color: rgb(0, 131, 255);
+	color: #5FA6AE;
 }
 
 time {
@@ -71,7 +71,8 @@ time {
 
 .content .header .siteTitle a:visited
 {
-    color: black;
+    color: #ACACAC;
+
 }
 
 .content .header nav
