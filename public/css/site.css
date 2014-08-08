@@ -1,10 +1,12 @@
 body
 {
     background-color: #FFFFFF;
-    color: #404040;
+    color: #494746;
     line-height: 1.6;
     font-size: 16pt;
-    font-family: LyonText, Georgia, serif;
+    font-family: 'Whitney SSm A', 'Whitney SSm B';
+    font-weight: 300;
+    font-style: normal;
 }
 p {
 
@@ -59,6 +61,7 @@ time {
     font-size: 3.5em;
     margin-bottom: 0.1em;
     margin-top: -0.25em;
+
 }
 
 .content .header .siteTitle a
