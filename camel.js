@@ -177,6 +177,7 @@ function generateHtmlAndMetadataForFile(file) {
         var metadata = parseMetadata(lines['metadata']);
         metadata['relativeLink'] = externalFilenameForFile(file);
         metadata['header'] = postHeaderTemplate(metadata);
+        console.log("Metadata is " + JSON.stringify(metadata));
         // If this is a post, assume a body class of 'post'.
         if (postRegex.test(file)) {
             metadata['BodyClass'] = 'post';
