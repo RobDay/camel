@@ -53,7 +53,7 @@ function init() {
     loadHeaderFooter('footer.html', function (data) { footerSource = data; });
     loadHeaderFooter('postHeader.html', function (data) {
         Handlebars.registerHelper('formatPostDate', function (date) {
-            return new Handlebars.SafeString(new Date(date).format('{Weekday} {d} {Month} {yyyy}, {h}:{mm} {TT}'));
+            return new Handlebars.SafeString(new Date(date).format('{Weekday} {Month} {d}, {yyyy} at {h}:{mm} {TT}'));
         });
         Handlebars.registerHelper('formatIsoDate', function (date) {
             return new Handlebars.SafeString(date !== undefined ? new Date(date).iso() : '');
@@ -153,7 +153,7 @@ function parseHtml(lines, replacements, postHeader) {
     // Perform replacements
     var header = performMetadataReplacements(replacements, headerSource);
     // Concatenate HTML
-    return header + postHeader + body + footerSource;
+    return header + (replacements['HideHeader'] === "true" ? "" : postHeader) + body + footerSource;
 }
 
 // Gets all the lines in a post and separates the metadata from the body
@@ -177,7 +177,6 @@ function generateHtmlAndMetadataForFile(file) {
         var metadata = parseMetadata(lines['metadata']);
         metadata['relativeLink'] = externalFilenameForFile(file);
         metadata['header'] = postHeaderTemplate(metadata);
-        console.log("Metadata is " + JSON.stringify(metadata));
         // If this is a post, assume a body class of 'post'.
         if (postRegex.test(file)) {
             metadata['BodyClass'] = 'post';

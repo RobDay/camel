@@ -1,9 +1,13 @@
 body
 {
     background-color: #FFFFFF;
-    color: #303030;
+    color: #404040;
     line-height: 1.6;
     font-size: 16pt;
+    font-family: LyonText, Georgia, serif;
+}
+p {
+
 }
 
 a {
@@ -254,18 +258,6 @@ blockquote {
     font-size: 0.9em;
 }
 
-figure
-{
-    display: inline;
-    float: right;
-}
-
-figure figcaption
-{
-    text-align: center;
-    font-style: italic;
-}
-
 .post .postHeader .postTitle:visited
 {
     color: black;
@@ -276,42 +268,4 @@ figure figcaption
     width: 50%;
     margin-top: 2em;
     margin-bottom: 2em;
-}
-
-.post th
-{
-    padding: 0 0.5em 0 0.5em;
-}
-
-.post td
-{
-    padding: 0 0.5em 0 0.5em;
-}
-
-/* ABOUT */
-.headshot
-{
-    float: left;
-    display: inline;
-	width: 250px;
-    margin-right: 1em;
-}
-
-/* SHOWBOT */
-.showbot table
-{
-    /*text-align: center; Because Siracusa said I wasn't allowed. */
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.showbot h2
-{
-    text-align: center;
-    text-decoration: underline;
-}
-
-.showbot .tables
-{
-    display: none;
 }
