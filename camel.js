@@ -153,7 +153,7 @@ function parseHtml(lines, replacements, postHeader) {
     // Perform replacements
     var header = performMetadataReplacements(replacements, headerSource);
     // Concatenate HTML
-    return header + (replacements['HideHeader'] === "true" ? "" : postHeader) + body + footerSource;
+    return header + postHeader + body + footerSource;
 }
 
 // Gets all the lines in a post and separates the metadata from the body
