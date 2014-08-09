@@ -93,10 +93,18 @@ time {
     .content {
         max-width: 300px;
     }
+    .content .header .siteTitle
+    {
+        font-size: 2.5em;
+        margin-bottom: 0.1em;
+        line-height:1.2em;
+        margin-top: -0.25em;
+
+    }
 }
 
 
-@media all and (max-width: 568px) {
+/*@media all and (max-width: 568px) {
 
     .container {
         margin-left:auto;
@@ -130,7 +138,7 @@ time {
         margin-left: 0.25em;
     }
 
-}
+}*/
 
 .content nav a {
      /*margin: 0 .2em;*/
