@@ -14,7 +14,7 @@ p {
 
 a {
 	text-decoration: none;
-	color: #4682b4;
+	color: #0586a6;
 }
 
 time {
@@ -24,8 +24,25 @@ time {
 .headerStrap {
     width:100%;
     height:40px;
-    background-color:#0A915B;
+    background-color:#354350;
+    margin-bottom: 1.4em;
 }
+
+.headerStrap nav
+{
+    text-transform: uppercase;
+    font-size: 0.85em;
+    color: rgb(228, 228, 228);
+    padding-top:6px;
+    padding-left:10px;
+}
+.headerStrap nav a {
+     /*margin: 0 .2em;*/
+     font-size: 1em;
+     font-weight:400;
+     padding:5px;
+     color:white;
+ }
 .content
 {
     text-align: left;
@@ -76,17 +93,11 @@ time {
 
 .content .header .siteTitle a:visited
 {
-    color: #ACACAC;
+    color: #95a5a6;
 
 }
 
-.content .header nav
-{
-    text-transform: uppercase;
-	font-size: 0.85em;
-    color: rgb(228, 228, 228);
-    margin-bottom: 1em;
-}
+
 
 @media (max-width: 680) {
     .content {
@@ -148,12 +159,6 @@ time {
 
 }*/
 
-.content nav a {
-     /*margin: 0 .2em;*/
-     font-size: 18px;
-     font-weight:400;
-     padding:5px;
- }
 
 .content code
 {

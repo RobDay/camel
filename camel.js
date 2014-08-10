@@ -26,7 +26,8 @@ var maxCacheSize = 50;
 var postsPerPage = 10;
 var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/;
 var utcOffset = 5;
-var cacheResetTimeInMillis = 1800000;
+// var cacheResetTimeInMillis = 1800000;
+var cacheResetTimeInMillis = 1000;
 
 var renderedPosts = {};
 var renderedRss = {};
