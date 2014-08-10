@@ -165,7 +165,10 @@ time {
     font-size: 0.9em;
     background-color: #F0F0F0;
 }
-
+.content pre {
+    margin-left:40px;
+    background-color: #F0F0F0
+}
 .copyright
 {
     font-size: 0.6em;

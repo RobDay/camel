@@ -27,8 +27,7 @@ var maxCacheSize = 50;
 var postsPerPage = 10;
 var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/;
 var utcOffset = 5;
-// var cacheResetTimeInMillis = 1800000;
-var cacheResetTimeInMillis = 1000;
+var cacheResetTimeInMillis = 1800000;
 
 var renderedPosts = {};
 var renderedRss = {};
@@ -182,8 +181,11 @@ function publishPendingPosts(callback) {
                 var metadata = parseMetadata(lines['metadata']);
                 var pubDate = Date.create(metadata['Date']);
                 var link = postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{M}") + '/' + pubDate.format('{d}') + '/';
-                fs.rename(fullFilename, link + file, function (err) {
-                    callback(err);
+                fs.mkdir(link, function (err) {
+                    fs.rename(fullFilename, link + file, function (err) {
+                        console.log(err);
+                        callback(err);
+                    })
                 })
 
             }, function (err) {
