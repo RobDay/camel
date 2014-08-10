@@ -665,12 +665,12 @@ app.get('/:slug', function (request, response) {
 /***************************************************
  * STARTUP                                         *
  ***************************************************/
-// init();
-// var port = Number(process.env.PORT || 5000);
-// server.listen(port, function () {
-//    console.log('Express server started on port %s', server.address().port);
-// });
+init();
+var port = Number(process.env.PORT || 5000);
+server.listen(port, function () {
+   console.log('Express server started on port %s', server.address().port);
+});
 
-publishPendingPosts(function (err) {
-    console.log("Err is " + err);
-})
+// publishPendingPosts(function (err) {
+//     console.log("Err is " + err);
+// })
