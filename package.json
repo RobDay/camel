@@ -3,40 +3,37 @@
   "version": "1.0.0",
   "description": "Barebones blogging software",
   "keywords": [
-      "blog",
-      "blogging"
+    "blog",
+    "blogging"
   ],
   "main": "camel.js",
   "homepage": "http://github.com/cliss/camel/",
   "repository": {
-      "type": "git",
-      "url": "https://github.com/cliss/camel.git"
+    "type": "git",
+    "url": "https://github.com/cliss/camel.git"
   },
-  "author": {
-      "name": "Casey Liss",
-      "url": "http://www.caseyliss.com/"
-  },
+  "author": "Casey Liss <casey@caseyliss.com>",
   "contributors": [
-      {
-          "name": "Ben Elsen",
-          "url": "http://benelsen.com/"
-      }
+    {
+      "name": "Ben Elsen",
+      "url": "http://benelsen.com/"
+    }
   ],
   "bugs": "https://github.com/cliss/camel/issues",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Casey Liss <casey@caseyliss.com>",
   "license": "MIT",
   "dependencies": {
+    "async": "^0.9.0",
+    "compression": "^1.0.2",
     "express": "^4.1.0",
-    "rss": "^0.3.2",
-    "q-io": "^1.11.0",
-    "sugar": "^1.4.1",
-    "underscore": "^1.6.0",
-    "marked": "^0.3.2",
     "handlebars": "^2.0.0",
-    "compression": "^1.0.2"
+    "marked": "^0.3.2",
+    "q-io": "^1.11.0",
+    "rss": "^0.3.2",
+    "sugar": "^1.4.1",
+    "underscore": "^1.6.0"
   },
   "engines": {
     "node": "0.10.x"

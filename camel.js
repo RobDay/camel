@@ -1,7 +1,7 @@
 /***************************************************
  * INITIALIZATION                                  *
  ***************************************************/
-
+var async = require('async');
 var express = require('express');
 var compress = require('compression');
 var http = require('http');
@@ -20,6 +20,7 @@ var server = http.createServer(app);
 
 // "Statics"
 var postsRoot = './posts/';
+var pendingPostsRoot = './pendingPosts/';
 var templateRoot = './templates/';
 var metadataMarker = '@@';
 var maxCacheSize = 50;
@@ -168,6 +169,29 @@ function getLinesFromPost(file) {
     var body = _.difference(lines, metadataLines).join('\n');
 
     return {metadata: metadataLines, body: body};
+}
+
+function publishPendingPosts(callback) {
+    fs.readdir(pendingPostsRoot, function (err, files){
+        if(err || !files) {
+            callback(err);
+        } else {
+            async.each(files, function (file, callback) {
+                var fullFilename = pendingPostsRoot + file;
+                var lines = getLinesFromPost(fullFilename);
+                var metadata = parseMetadata(lines['metadata']);
+                var pubDate = Date.create(metadata['Date']);
+                var link = postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{M}") + '/' + pubDate.format('{d}') + '/';
+                fs.rename(fullFilename, link + file, function (err) {
+                    callback(err);
+                })
+
+            }, function (err) {
+                callback(err);
+            })
+
+        }
+    })
 }
 
 // Gets the metadata & rendered HTML for this file
@@ -641,8 +665,12 @@ app.get('/:slug', function (request, response) {
 /***************************************************
  * STARTUP                                         *
  ***************************************************/
-init();
-var port = Number(process.env.PORT || 5000);
-server.listen(port, function () {
-   console.log('Express server started on port %s', server.address().port);
-});
+// init();
+// var port = Number(process.env.PORT || 5000);
+// server.listen(port, function () {
+//    console.log('Express server started on port %s', server.address().port);
+// });
+
+publishPendingPosts(function (err) {
+    console.log("Err is " + err);
+})
