@@ -70,7 +70,10 @@ function init() {
         gfm: true,
         tables: true,
         smartLists: true,
-        smartypants: true
+        smartypants: true,
+        highlight: function (code) {
+            return require('highlight.js').highlightAuto(code).value;
+          }
     });
 }
 
