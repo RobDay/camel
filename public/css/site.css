@@ -111,8 +111,9 @@ img
 .content pre {
     margin-left:40px;
     background-color: #F0F0F0;
-    padding:5px;
+    padding:1em;
     overflow:scroll;
+    border-radius: 0.25em;
 }
 .copyright
 {
