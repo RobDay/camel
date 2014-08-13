@@ -4,17 +4,18 @@
 I was recently working with a UIPageViewController attempting to make a strategy that would allow the pageViewController to reload its neighbors.  While implementing the solution, I found that if you call `setViewControllers` on a pageViewController with the current onscreen view controller problems would arise.  It seems that the pageViewController will leak the original view controller that was set in the initial `setViewControllers` call.
 
 For example:
+```swift
+let pvc = UIPageViewController(transitionStyle: .Scroll,
+            navigationOrientation:.Horizontal,
+            options:nil)
+let someVC = UIViewController()
 
-    let pvc = UIPageViewController(transitionStyle: .Scroll,
-                navigationOrientation:.Horizontal,
-                options:nil)
-    let someVC = UIViewController()
+pvc.setViewControllers([someVC],
+    direction: UIPageViewControllerNavigationDirection.Forward,
+    animated: false) { _ in
 
-    pvc.setViewControllers([someVC],
-        direction: UIPageViewControllerNavigationDirection.Forward,
-        animated: false) { _ in
-
-    }
+}
+```
 ...some time later...
 
     pvc.setViewControllers([someVC],
