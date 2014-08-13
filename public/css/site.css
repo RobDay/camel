@@ -83,7 +83,176 @@ time {
     font-size: 3.5em;
     margin-bottom: 0.1em;
     margin-top: -0.25em;
-    font-family: ArcherPro-Book;
+    /*font-family: ArcherPro-Book;*/
+    /*font-family: ArcherPro-Bold;*/
+    /*font-family: ArcherPro-BoldIta;*/
+    /*font-family: ArcherPro-Book;*/
+    /*font-family: ArcherPro-Medium;*/
+    /*font-family: ArcherPro-Semibold;*/
+    /*font-family: Deseret-HTF-LargeSize;*/
+    /*font-family: DidotHTF-06Light;*/
+    /*font-family: DidotHTF-06Medium;*/
+    /*font-family: DidotHTF-16Bold;*/
+    /*font-family: Historical-EnglishTextura;*/
+    /*font-family: Historical-EnglishTexturaAlt;*/
+
+    /*font-family: HoeflerTitling-HTF-BdRoman;*/
+    /*font-family: HoeflerTitling-HTF-LtSC;*/
+    /*font-family: Knockout-HTF32-JuniorCruiserwt;*/
+    /*font-family: Knockout-HTF52-Cruiserweight;*/
+    /*font-family: Mercury-DisplayBold;*/
+
+    /*font-family: Mercury-DisplayBoldSC;*/
+    /*font-family: Mercury-DisplayRoman;*/
+    /*font-family: Mercury-DisplayRomanSC;*/
+    /*font-family: Mercury-NumericG1Bold;*/
+    /*font-family: Mercury-NumericG1BoldItalic;*/
+    /*font-family: Mercury-NumericG1Italic;*/
+    /*font-family: Mercury-NumericG1Roman;*/
+    /*font-family: Mercury-NumericG1Semibold;*/
+    /*font-family: Mercury-NumericG1SemiboldItalic;*/
+    /*font-family: Mercury-NumericG2Bold;*/
+    /*font-family: Mercury-NumericG2BoldItalic;*/
+    /*font-family: Mercury-NumericG2Italic;*/
+    /*font-family: Mercury-NumericG2Roman;*/
+    /*font-family: Mercury-NumericG2Semibold;*/
+    /*font-family: Mercury-NumericG2SemiboldItalic;*/
+    /*font-family: Mercury-NumericG3Bold;*/
+    /*font-family: Mercury-NumericG3BoldItalic;*/
+    /*font-family: Mercury-NumericG3Italic;*/
+    /*font-family: Mercury-NumericG3Roman;*/
+    /*font-family: Mercury-NumericG3Semibold;*/
+    /*font-family: Mercury-NumericG3SemiboldItalic;*/
+    /*font-family: Mercury-NumericG4Bold;*/
+    /*font-family: Mercury-NumericG4BoldItalic;*/
+    /*font-family: Mercury-NumericG4Italic;*/
+    /*font-family: Mercury-NumericG4Roman;*/
+    /*font-family: Mercury-NumericG4Semibold;*/
+    /*font-family: Mercury-NumericG4SemiboldItalic;*/
+    /*font-family: Mercury-TextG1Bold;*/
+    /*font-family: Mercury-TextG1BoldItalic;*/
+    /*font-family: Mercury-TextG1BoldSC;*/
+    /*font-family: Mercury-TextG1Italic;*/
+    /*font-family: Mercury-TextG1Roman;*/
+    /*font-family: Mercury-TextG1RomanSC;*/
+    /*font-family: Mercury-TextG1Semibold;*/
+    /*font-family: Mercury-TextG1SemiboldItalic;*/
+    /*font-family: Mercury-TextG1SemiboldSC;*/
+    /*font-family: Mercury-TextG2Bold;*/
+    /*font-family: Mercury-TextG2BoldItalic;*/
+    /*font-family: Mercury-TextG2BoldSC;*/
+    /*font-family: Mercury-TextG2Italic;*/
+    /*font-family: Mercury-TextG2Roman;*/
+    /*font-family: Mercury-TextG2RomanSC;*/
+    /*font-family: Mercury-TextG2Semibold;*/
+    /*font-family: Mercury-TextG2SemiboldItalic;*/
+    /*font-family: Mercury-TextG2SemiboldSC;*/
+    /*font-family: Mercury-TextG3Bold;*/
+    /*font-family: Mercury-TextG3BoldItalic;*/
+    /*font-family: Mercury-TextG3BoldSC;*/
+    /*font-family: Mercury-TextG3Italic;*/
+    /*font-family: Mercury-TextG3Roman;*/
+    /*font-family: Mercury-TextG3RomanSC;*/
+    /*font-family: Mercury-TextG3Semibold;*/
+    /*font-family: Mercury-TextG3SemiboldItalic;*/
+    /*font-family: Mercury-TextG3SemiboldSC;*/
+    /*font-family: Mercury-TextG4Bold;*/
+    /*font-family: Mercury-TextG4BoldItalic;*/
+    /*font-family: Mercury-TextG4BoldSC;*/
+    /*font-family: Mercury-TextG4Italic;*/
+    /*font-family: Mercury-TextG4Roman;*/
+    /*font-family: Mercury-TextG4RomanSC;*/
+    /*font-family: Mercury-TextG4Semibold;*/
+    /*font-family: Mercury-TextG4SemiboldItalic;*/
+    /*font-family: Mercury-TextG4SemiboldSC;*/
+    /*font-family: Numbers;*/
+    /*font-family: Bayside.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Claimcheck.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Delancey.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Depot.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Deuce.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Dividend.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Greenback.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Indicia.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Premium.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Prospekt.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Redbird.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Revenue.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Strasse.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: Trafalgar.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: ValutaOpen.ttf;*/
+    /*font-family: Numbers;*/
+    /*font-family: ValutaSolid.ttf;*/
+    /*font-family: OdeonHTF-CondensedAlternate;*/
+    /*font-family: OdeonHTF-CondensedRegular;*/
+    /*font-family: RequiemDisplay-HTF-Italic;*/
+    /*font-family: RequiemDisplay-HTF-ItalicLigs;*/
+    /*font-family: RequiemDisplay-HTF-Roman;*/
+    /*font-family: RequiemDisplay-HTF-SmallCaps;*/
+    /*font-family: RequiemFine-HTF-Italic;*/
+    /*font-family: RequiemFine-HTF-ItalicLigs;*/
+    /*font-family: RequiemFine-HTF-Roman;*/
+    /*font-family: RequiemFine-HTF-SmallCaps;*/
+    /*font-family: RequiemOrnaments-HTF-Display;*/
+    /*font-family: RequiemOrnaments-HTF-Text;*/
+    /*font-family: RequiemText-HTF-Italic;*/
+    /*font-family: RequiemText-HTF-ItalicLigs;*/
+    /*font-family: RequiemText-HTF-Roman;*/
+    /*font-family: RequiemText-HTF-SmallCaps;*/
+    /*font-family: Saracen-HTF-Black;*/
+    /*font-family: Schneidler-HTF-Titling;*/
+    /*font-family: TodaySH-Medium;*/
+    /*font-family: TodaySH-Regular;*/
+    /*font-family: TodaySH-Ultra;*/
+    /*font-family: Verlag-Black.ttf;
+    font-family: Verlag-BlackItalic.ttf;
+    font-family: Verlag-Bold.ttf;
+    font-family: Verlag-BoldItalic.ttf;
+    font-family: Verlag-Book.ttf;
+    font-family: Verlag-BookItalic.ttf;
+    font-family: Verlag-Light.ttf;
+    font-family: Verlag-LightItalic.ttf;
+    font-family: Verlag-XLight.ttf;
+    font-family: Verlag-XLightItalic.ttf;
+    font-family: VerlagCompressed-Black.ttf;
+    font-family: VerlagCompressed-BlackItalic.ttf;
+    font-family: VerlagCompressed-Bold.ttf;
+    font-family: VerlagCompressed-BoldItalic.ttf;
+    font-family: VerlagCompressed-Book.ttf;
+    font-family: VerlagCompressed-BookItalic.ttf;
+    font-family: VerlagCompressed-Light.ttf;
+    font-family: VerlagCompressed-LightItalic.ttf;
+    font-family: VerlagCompressed-XLight.ttf;
+    font-family: VerlagCompressed-XLightItalic.ttf;
+    font-family: VerlagCondensed-Black.ttf;
+    font-family: VerlagCondensed-BlackItalic.ttf;
+    font-family: VerlagCondensed-Bold.ttf;
+    font-family: VerlagCondensed-BoldItalic.ttf;
+    font-family: VerlagCondensed-Book.ttf;
+    font-family: VerlagCondensed-BookItalic.ttf;
+    font-family: VerlagCondensed-Light.ttf;
+    font-family: VerlagCondensed-LightItalic.ttf;
+    font-family: VerlagCondensed-XLight.ttf;
+    font-family: VerlagCondensed-XLightItalic.ttf;*/
+    /*font-family: WoodtypeAntiqueXXXCond;*/
+    /*font-family: WoodtypeGothicExtended;*/
+    /*font-family: Ziggurat-HTF-Black-Italic;*/
+    /*font-family: Ziggurat-HTF-Black;*/
+
 
 }
 
@@ -237,7 +406,7 @@ blockquote {
     display: block;
 }
 
-.homepage .day .article
+.homepage .day article
 {
     margin-bottom: 4em;
 }
@@ -247,19 +416,19 @@ blockquote {
     margin-top: -2em;
 }
 
-.homepage .article hr
+.homepage article hr
 {
     width: 35%;
     margin-top: 2em;
     margin-bottom: 2em;
 }
 
-.homepage .article th
+.homepage article th
 {
     padding: 0 0.5em 0 0.5em
 }
 
-.homepage .article td
+.homepage article td
 {
     padding: 0 0.5em 0 0.5em;
 }
