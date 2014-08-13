@@ -83,7 +83,7 @@ time {
     font-size: 3.5em;
     margin-bottom: 0.1em;
     margin-top: -0.25em;
-    font-family: RequiemDisplay-HTF-Roman;
+    font-family: ArcherPro-Book;
 
 }
 
@@ -168,7 +168,8 @@ time {
 }
 .content pre {
     margin-left:40px;
-    background-color: #F0F0F0
+    background-color: #F0F0F0;
+    padding:5px;
 }
 .copyright
 {
@@ -325,6 +326,70 @@ src: url(/fonts/AcropolisHTF-BlackItalic.otf);
 @font-face {
 font-family: Appellation-HTF;
 src: url(/fonts/Appellation-HTF.otf);
+}
+@font-face {
+font-family: ArcherPro-Bold;
+src: url(/fonts/ArcherPro-Bold.otf);
+}
+@font-face {
+font-family: ArcherPro-BoldIta;
+src: url(/fonts/ArcherPro-BoldIta.otf);
+}
+@font-face {
+font-family: ArcherPro-Book;
+src: url(/fonts/ArcherPro-Book.otf);
+}
+@font-face {
+font-family: ArcherPro-BookIta;
+src: url(/fonts/ArcherPro-BookIta.otf);
+}
+@font-face {
+font-family: ArcherPro-Hairline;
+src: url(/fonts/ArcherPro-Hairline.otf);
+}
+@font-face {
+font-family: ArcherPro-HairlineIta;
+src: url(/fonts/ArcherPro-HairlineIta.otf);
+}
+@font-face {
+font-family: ArcherPro-Light;
+src: url(/fonts/ArcherPro-Light.otf);
+}
+@font-face {
+font-family: ArcherPro-LightIta;
+src: url(/fonts/ArcherPro-LightIta.otf);
+}
+@font-face {
+font-family: ArcherPro-Medium;
+src: url(/fonts/ArcherPro-Medium.otf);
+}
+@font-face {
+font-family: ArcherPro-MediumIta;
+src: url(/fonts/ArcherPro-MediumIta.otf);
+}
+@font-face {
+font-family: ArcherPro-Semibold;
+src: url(/fonts/ArcherPro-Semibold.otf);
+}
+@font-face {
+font-family: ArcherPro-SemiboldIta;
+src: url(/fonts/ArcherPro-SemiboldIta.otf);
+}
+@font-face {
+font-family: ArcherPro-Thin;
+src: url(/fonts/ArcherPro-Thin.otf);
+}
+@font-face {
+font-family: ArcherPro-ThinIta;
+src: url(/fonts/ArcherPro-ThinIta.otf);
+}
+@font-face {
+font-family: ArcherPro-XLight;
+src: url(/fonts/ArcherPro-XLight.otf);
+}
+@font-face {
+font-family: ArcherPro-XLightIta;
+src: url(/fonts/ArcherPro-XLightIta.otf);
 }
 @font-face {
 font-family: Champion-HTF-Bantamweight;
