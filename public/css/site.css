@@ -113,7 +113,7 @@ img
     margin-left:40px;
     background-color: #F0F0F0;
     padding:1em;
-    overflow:scroll;
+    overflow:auto;
     border-radius: 0.25em;
 }
 .copyright
