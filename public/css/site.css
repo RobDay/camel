@@ -274,6 +274,9 @@ img
         margin-top: -0.25em;
 
     }
+    .content pre {
+        margin-left:10px;
+    }
     body {
         font-size:.9em;
     }
