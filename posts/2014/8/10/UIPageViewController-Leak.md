@@ -23,8 +23,8 @@ pvc.setViewControllers([someVC],
         animated: false) { _ in
 
     }
-    //At this point, the original 'someVC' is still in memory
-    //and doesn't get cleaned up
+    // At this point, the original 'someVC' is still in memory
+    // and doesn't get cleaned up
 
 
 The only workaround I found that prevented the leaking of a view controller was to first set the current view controller to a placeholder view controller and then immediately set it back:
