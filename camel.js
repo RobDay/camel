@@ -183,7 +183,7 @@ function publishPendingPosts(callback) {
                 var lines = getLinesFromPost(fullFilename);
                 var metadata = parseMetadata(lines['metadata']);
                 var pubDate = Date.create(metadata['Date']);
-                var link = postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{M}") + '/' + pubDate.format('{d}') + '/';
+                var link = postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{MM}") + '/' + pubDate.format('{dd}') + '/';
                 fs.mkdir(link, function (err) {
                     fs.rename(fullFilename, link + file, function (err) {
                         console.log(err);
