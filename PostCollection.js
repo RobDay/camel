@@ -169,6 +169,11 @@ module.exports = function() {
         });
 
     }
+
+    PostCollection.postForFile = function(file) {
+        var html = postFormatter.generateHtmlForFile(file);
+        return html;
+    }
     return PostCollection;
 
 }

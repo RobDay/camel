@@ -80,13 +80,7 @@ function loadAndSendMarkdownFile(file, response) {
                 response.send(400, {error: 'Markdown file not found.'});
             }
         });
-    } else if (fetchFromCache(file) != null) {
-        // Send the cached version.
-        console.log('Sending cached file: ' + file);
-        response.send(200, fetchFromCache(file)['body']);
-        return;
     } else {
-        // Fetch the real deal.
         fs.exists(file + '.md', function (exists) {
             if (!exists) {
                 console.log('404: ' + file);
@@ -94,11 +88,30 @@ function loadAndSendMarkdownFile(file, response) {
                 return;
             }
 
-            console.log('Sending file: ' + file)
-            var html = generateHtmlForFile(file);
-            response.send(200, html);
         });
+        var html = postCollection.postForFile(file);
+        response.send(200, html);
     }
+
+    // else if (fetchFromCache(file) != null) {
+    //     // Send the cached version.
+    //     console.log('Sending cached file: ' + file);
+    //     response.send(200, fetchFromCache(file)['body']);
+    //     return;
+    // } else {
+    //     // Fetch the real deal.
+    //     fs.exists(file + '.md', function (exists) {
+    //         if (!exists) {
+    //             console.log('404: ' + file);
+    //             response.send(404, {error: 'A post with that address is not found.'});
+    //             return;
+    //         }
+    //
+    //         console.log('Sending file: ' + file)
+    //         var html = generateHtmlForFile(file);
+    //         response.send(200, html);
+    //     });
+    // }
 }
 
 // Handles a route by trying the cache first.
