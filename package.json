@@ -35,7 +35,8 @@
     "q-io": "^1.11.0",
     "rss": "^0.3.2",
     "sugar": "^1.4.1",
-    "underscore": "^1.6.0"
+    "underscore": "^1.6.0",
+    "winston": "^0.8.1"
   },
   "engines": {
     "node": "0.10.x"

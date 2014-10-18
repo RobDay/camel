@@ -7,11 +7,10 @@ var compress = require('compression');
 var http = require('http');
 var fs = require('fs');
 var qfs = require('q-io/fs');
-var sugar = require('sugar');
 var _ = require('underscore');
-var marked = require('marked');
+
 var rss = require('rss');
-var Handlebars = require('handlebars');
+
 var mkdirp = require('mkdirp');
 var app = express();
 app.use(compress());
@@ -77,17 +76,17 @@ function init() {
     });
 }
 
-function loadHeaderFooter(file, completion) {
-    fs.exists(templateRoot + file, function(exists) {
-        if (exists) {
-            fs.readFile(templateRoot + file, {encoding: 'UTF8'}, function (error, data) {
-                if (!error) {
-                    completion(data);
-                }
-            });
-        }
-    });
-}
+// function loadHeaderFooter(file, completion) {
+//     fs.exists(templateRoot + file, function(exists) {
+//         if (exists) {
+//             fs.readFile(templateRoot + file, {encoding: 'UTF8'}, function (error, data) {
+//                 if (!error) {
+//                     completion(data);
+//                 }
+//             });
+//         }
+//     });
+// }
 
 function normalizedFileName(file) {
     var retVal = file;
@@ -116,113 +115,87 @@ function fetchFromCache(file) {
     return renderedPosts[normalizedFileName(file)] || null;
 }
 
-// Parses the metadata in the file
-function parseMetadata(lines) {
-    var retVal = {};
+// // Parses the metadata in the file
+// function parseMetadata(lines) {
+//     var retVal = {};
+//
+//     lines.each(function (line) {
+//         line = line.replace(metadataMarker, '');
+//         line = line.compact();
+//         if (line.has('=')) {
+//             var firstIndex = line.indexOf('=');
+//             retVal[line.first(firstIndex)] = line.from(firstIndex + 1);
+//         }
+//     });
+//
+//     // NOTE: Some metadata is added in generateHtmlAndMetadataForFile().
+//
+//     // Merge with site default metadata
+//     Object.merge(retVal, siteMetadata, false, function(key, targetVal, sourceVal) {
+//         // Ensure that the file wins over the defaults.
+//         console.log('overwriting "' + sourceVal + '" with "' + targetVal);
+//         return targetVal;
+//     });
+//
+//     return retVal;
+// }
 
-    lines.each(function (line) {
-        line = line.replace(metadataMarker, '');
-        line = line.compact();
-        if (line.has('=')) {
-            var firstIndex = line.indexOf('=');
-            retVal[line.first(firstIndex)] = line.from(firstIndex + 1);
-        }
-    });
+// function performMetadataReplacements(replacements, haystack) {
+//     _.keys(replacements).each(function (key) {
+//         // Ensure that it's a global replacement; non-regex treatment is first-only.
+//         haystack = haystack.replace(new RegExp(metadataMarker + key + metadataMarker, 'g'), replacements[key]);
+//     });
+//
+//     return haystack;
+// }
 
-    // NOTE: Some metadata is added in generateHtmlAndMetadataForFile().
+// // Parses the HTML and renders it.
+// function parseHtml(lines, replacements, postHeader) {
+//     // Convert from markdown
+//     var body = performMetadataReplacements(replacements, marked(lines));
+//     // Perform replacements
+//     var header = performMetadataReplacements(replacements, headerSource);
+//     // Concatenate HTML
+//     return header + postHeader + body + footerSource;
+// }
 
-    // Merge with site default metadata
-    Object.merge(retVal, siteMetadata, false, function(key, targetVal, sourceVal) {
-        // Ensure that the file wins over the defaults.
-        console.log('overwriting "' + sourceVal + '" with "' + targetVal);
-        return targetVal;
-    });
+// // Gets all the lines in a post and separates the metadata from the body
+// function getLinesFromPost(file) {
+//     file = file.endsWith('.md') ? file : file + '.md';
+//     var data = fs.readFileSync(file, {encoding: 'UTF8'});
+//
+//     // Extract the pieces
+//     var lines = data.lines();
+//     var metadataLines = _.filter(lines, function (line) { return line.startsWith(metadataMarker); });
+//     var body = _.difference(lines, metadataLines).join('\n');
+//
+//     return {metadata: metadataLines, body: body};
+// }
 
-    return retVal;
-}
 
-function performMetadataReplacements(replacements, haystack) {
-    _.keys(replacements).each(function (key) {
-        // Ensure that it's a global replacement; non-regex treatment is first-only.
-        haystack = haystack.replace(new RegExp(metadataMarker + key + metadataMarker, 'g'), replacements[key]);
-    });
 
-    return haystack;
-}
-
-// Parses the HTML and renders it.
-function parseHtml(lines, replacements, postHeader) {
-    // Convert from markdown
-    var body = performMetadataReplacements(replacements, marked(lines));
-    // Perform replacements
-    var header = performMetadataReplacements(replacements, headerSource);
-    // Concatenate HTML
-    return header + postHeader + body + footerSource;
-}
-
-// Gets all the lines in a post and separates the metadata from the body
-function getLinesFromPost(file) {
-    file = file.endsWith('.md') ? file : file + '.md';
-    var data = fs.readFileSync(file, {encoding: 'UTF8'});
-
-    // Extract the pieces
-    var lines = data.lines();
-    var metadataLines = _.filter(lines, function (line) { return line.startsWith(metadataMarker); });
-    var body = _.difference(lines, metadataLines).join('\n');
-
-    return {metadata: metadataLines, body: body};
-}
-
-function publishPendingPosts(callback) {
-    fs.readdir(pendingPostsRoot, function (err, files){
-        if(err || !files) {
-            callback(err);
-        } else {
-            async.each(files, function (file, callback) {
-
-                var fullFilename = pendingPostsRoot + file;
-                var lines = getLinesFromPost(fullFilename);
-                var metadata = parseMetadata(lines['metadata']);
-                var pubDate = Date.create(metadata['Date']);
-                var link = postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{MM}") + '/' + pubDate.format('{dd}') + '/';
-                mkdirp(link, function (err) {
-                    console.log("HERE" + err);
-                    fs.rename(fullFilename, link + file, function (err) {
-                        console.log(err);
-                        callback(err);
-                    })
-                })
-
-            }, function (err) {
-                callback(err);
-            })
-
-        }
-    })
-}
-
-// Gets the metadata & rendered HTML for this file
-function generateHtmlAndMetadataForFile(file) {
-    var retVal = fetchFromCache(file);
-    if (retVal == undefined) {
-        var lines = getLinesFromPost(file);
-        var metadata = parseMetadata(lines['metadata']);
-        metadata['relativeLink'] = externalFilenameForFile(file);
-        metadata['header'] = postHeaderTemplate(metadata);
-        // If this is a post, assume a body class of 'post'.
-        if (postRegex.test(file)) {
-            metadata['BodyClass'] = 'post';
-        }
-        var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
-        addRenderedPostToCache(file, {
-            metadata: metadata,
-            body: html,
-            unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)) }
-        );
-    }
-
-    return fetchFromCache(file);
-}
+// // Gets the metadata & rendered HTML for this file
+// function generateHtmlAndMetadataForFile(file) {
+//     var retVal = fetchFromCache(file);
+//     if (retVal == undefined) {
+//         var lines = getLinesFromPost(file);
+//         var metadata = parseMetadata(lines['metadata']);
+//         metadata['relativeLink'] = externalFilenameForFile(file);
+//         metadata['header'] = postHeaderTemplate(metadata);
+//         // If this is a post, assume a body class of 'post'.
+//         if (postRegex.test(file)) {
+//             metadata['BodyClass'] = 'post';
+//         }
+//         var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
+//         addRenderedPostToCache(file, {
+//             metadata: metadata,
+//             body: html,
+//             unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)) }
+//         );
+//     }
+//
+//     return fetchFromCache(file);
+// }
 
 // Gets the metadata for this file
 function generateMetadataForFile(file) {
