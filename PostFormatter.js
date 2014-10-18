@@ -13,6 +13,8 @@ var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/; // Const
 var postHeaderTemplate = null;
 var siteMetadata = {};
 
+// var postCache = require("./PostCache")();
+
 
 module.exports = function () {
 

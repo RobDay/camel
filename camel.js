@@ -25,59 +25,24 @@ var pendingPostsRoot = './pendingPosts/';
 var templateRoot = './templates/';
 var metadataMarker = '@@';
 var maxCacheSize = 50;
-var postsPerPage = 10;
 var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/;
 var utcOffset = 5;
-var cacheResetTimeInMillis = 1800000;
+// var cacheResetTimeInMillis = 1800000;
 
-var renderedPosts = {};
+// var renderedPosts = {};
 var renderedRss = {};
-var allPostsSortedGrouped = {};
+// var allPostsSortedGrouped = {};
 var headerSource = undefined;
 var footerSource = null;
 // var postHeaderTemplate = null;
 var siteMetadata = {};
 
 var postFormatter = require("./PostFormatter")();
+var postCollection = require("./PostCollection")();
 
 /***************************************************
  * HELPER METHODS                                  *
  ***************************************************/
-
-function init() {
-    // Kill the cache every 30 minutes.
-    setInterval(emptyCache, cacheResetTimeInMillis);
-}
-
-
-//Used for caching
-function normalizedFileName(file) {
-    console.log("File is" + file);
-    var retVal = file;
-    if (file.startsWith('posts')) {
-        retVal = './' + file;
-    }
-
-    retVal = retVal.replace('.md', '');
-
-    return retVal;
-}
-
-function addRenderedPostToCache(file, postData) {
-    //console.log('Adding to cache: ' + normalizedFileName(file));
-    renderedPosts[normalizedFileName(file)] = _.extend({ file: normalizedFileName(file), date: new Date() }, postData);
-
-    if (_.size(renderedPosts) > maxCacheSize) {
-        var sorted = _.sortBy(renderedPosts, function (post) { return post['date']; });
-        delete renderedPosts[sorted.first()['file']];
-    }
-
-    //console.log('Cache has ' + JSON.stringify(_.keys(renderedPosts)));
-}
-
-function fetchFromCache(file) {
-    return renderedPosts[normalizedFileName(file)] || null;
-}
 
 
 // Gets the external link for this file. Relative if request is
@@ -91,115 +56,6 @@ function externalFilenameForFile(file, request) {
     return retVal;
 }
 
-// Gets all the posts, grouped by day and sorted descending.
-// Completion handler gets called with an array of objects.
-// Array
-//   +-- Object
-//   |     +-- 'date' => Date for these articles
-//   |     `-- 'articles' => Array
-//   |            +-- (Article Object)
-//   |            +-- ...
-//   |            `-- (Article Object)
-//   + ...
-//   |
-//   `-- Object
-//         +-- 'date' => Date for these articles
-//         `-- 'articles' => Array
-//                +-- (Article Object)
-//                +-- ...
-//                `-- (Article Object)
-function allPostsSortedAndGrouped(completion) {
-    console.log("HERE4");
-    if (Object.size(allPostsSortedGrouped) != 0) {
-        console.log("HERE5");
-        completion(allPostsSortedGrouped);
-    } else {
-        console.log("Here6");
-        qfs.listTree(postsRoot, function (name, stat) {
-            console.log("HERE7");
-            return postRegex.test(name);
-        }).then(function (files) {
-            console.log("HERE8");
-            // Lump the posts together by day
-            var groupedFiles = _.groupBy(files, function (file) {
-                console.log("HERE9");
-                var parts = file.split('/');
-                return new Date(parts[1], parts[2] - 1, parts[3]);
-            });
-
-            // Sort the days from newest to oldest
-            console.log("HERE10");
-            var retVal = [];
-            var sortedKeys = _.sortBy(_.keys(groupedFiles), function (date) {
-                return new Date(date);
-            }).reverse();
-            console.log("HERE11");
-            // For each day...
-            _.each(sortedKeys, function (key) {
-                // Get all the filenames...
-                var articleFiles = groupedFiles[key];
-                var articles = [];
-                // ...get all the data for that file ...
-                _.each(articleFiles, function (file) {
-                    articles.push(postFormatter.generateHtmlAndMetadataForFile(file));
-                });
-
-                // ...so we can sort the posts...
-                articles = _.sortBy(articles, function (article) {
-                    // ...by their post date and TIME.
-                    return Date.create(article['metadata']['Date']);
-                }).reverse();
-                // Array of objects; each object's key is the date, value
-                // is an array of objects
-                // In that array of objects, there is a body & metadata.
-                retVal.push({date: key, articles: articles});
-            });
-
-            allPostsSortedGrouped = retVal;
-            completion(retVal);
-        });
-    }
-}
-
-// Gets all the posts, paginated.
-// Goes through the posts, descending date order, and joins
-// days together until there are 10 or more posts. Once 10
-// posts are hit, that's considered a page.
-// Forcing to exactly 10 posts per page seemed artificial, and,
-// frankly, harder.
-function allPostsPaginated(completion) {
-    console.log("HERE2");
-    allPostsSortedAndGrouped(function (postsByDay) {
-        console.log("HERE3");
-        var pages = [];
-        var thisPageDays = [];
-        var count = 0;
-        postsByDay.each(function (day) {
-            count += day['articles'].length;
-            thisPageDays.push(day);
-            // Reset count if need be
-            if (count >= postsPerPage) {
-                pages.push({ page: pages.length + 1, days: thisPageDays });
-                thisPageDays = [];
-                count = 0;
-            }
-        });
-
-        if (thisPageDays.length > 0) {
-            pages.push({ page: pages.length + 1, days: thisPageDays});
-        }
-
-        completion(pages);
-    });
-}
-
-// Empties the caches.
-function emptyCache() {
-    console.log('Emptying the cache.');
-    renderedPosts = {};
-    renderedRss = {};
-    allPostsSortedGrouped = {};
-}
 
 /***************************************************
  * ROUTE HELPERS                                   *
@@ -245,61 +101,24 @@ function loadAndSendMarkdownFile(file, response) {
     }
 }
 
-// Sends a listing of an entire year's posts.
-function sendYearListing(request, response) {
-    var year = request.params.slug;
-    var retVal = '<h1>Posts for ' + year + '</h1>';
-    var currentMonth = null;
-
-    allPostsSortedAndGrouped(function (postsByDay) {
-        postsByDay.each(function (day) {
-            var thisDay = Date.create(day['date']);
-            if (thisDay.is(year)) {
-                // Date.isBetween() is not inclusive, so back the from date up one
-                var thisMonth = new Date(Number(year), Number(currentMonth)).addDays(-1);
-                // ...and advance the to date by two (one to offset above, one to genuinely add).
-                var nextMonth = Date.create(thisMonth).addMonths(1).addDays(2);
-
-                //console.log(thisMonth.short() + ' <-- ' + thisDay.short() + ' --> ' + nextMonth.short() + '?   ' + (thisDay.isBetween(thisMonth, nextMonth) ? 'YES' : 'NO'));
-                if (currentMonth == null || !thisDay.isBetween(thisMonth, nextMonth)) {
-                    // If we've started a month list, end it, because we're on a new month now.
-                    if (currentMonth >= 0) {
-                        retVal += '</ul>'
-                    }
-
-                    currentMonth = thisDay.getMonth();
-                    retVal += '<h2><a href="/' + year + '/' + (currentMonth + 1) + '/">' + thisDay.format('{Month}') + '</a></h2>\n<ul>';
-                }
-
-                day['articles'].each(function (article) {
-                    retVal += '<li><a href="' + externalFilenameForFile(article['file']) + '">' + article['metadata']['Title'] + '</a></li>';
-                });
-            }
-        });
-
-        var header = headerSource.replace(metadataMarker + 'Title' + metadataMarker, 'Posts for ' + year);
-        response.send(header + retVal + footerSource);
-    });
-
-}
-
 // Handles a route by trying the cache first.
 // file: file to try.
 // sender: function to send result to the client. Only parameter is an object that has the key 'body', which is raw HTML
 // generator: function to generate the raw HTML. Only parameter is a function that takes a completion handler that takes the raw HTML as its parameter.
 // bestRouteHandler() --> generator() to build HTML --> completion() to add to cache and send
 function baseRouteHandler(file, sender, generator) {
-    if (fetchFromCache(file) == null) {
+    //TODO: Use the cache again
+    // if (fetchFromCache(file) == null) {
         console.log('Not in cache: ' + file);
         generator(function (postData) {
             console.log("HERE");
-            addRenderedPostToCache(file, {body: postData});
+            // addRenderedPostToCache(file, {body: postData});
             sender({body: postData});
         });
-    } else {
-        console.log('In cache: ' + file);
-        sender(fetchFromCache(file));
-    }
+    // } else {
+    //     console.log('In cache: ' + file);
+    //     sender(fetchFromCache(file));
+    // }
 }
 
 /***************************************************
@@ -335,7 +154,7 @@ app.get('/', function (request, response) {
 
         var bodyHtml = '';
         console.log("BLAH");
-        allPostsPaginated(function (pages) {
+        postCollection.allPostsPaginated(function (pages) {
             console.log("HERE0");
             // If we're asking for a page that doesn't exist, redirect.
             if (page < 0 || page > pages.length) {
@@ -399,7 +218,7 @@ app.get('/rss', function (request, response) {
 
         var max = 10;
         var i = 0;
-        allPostsSortedAndGrouped(function (postsByDay) {
+        postCollection.allPostsSortedAndGrouped(function (postsByDay) {
             postsByDay.forEach(function (day) {
                 day['articles'].forEach(function (article) {
                     if (i < max) {
@@ -524,14 +343,14 @@ app.get('/:slug', function (request, response) {
         loadAndSendMarkdownFile(file, response);
     // If it's a year, handle that.
     } else {
-        sendYearListing(request, response);
+        postCollection.sendYearListing(request, response);
     }
 });
 
 /***************************************************
  * STARTUP                                         *
  ***************************************************/
-init();
+// init();
 var port = Number(process.env.PORT || 5000);
 server.listen(port, function () {
    console.log('Express server started on port %s', server.address().port);
