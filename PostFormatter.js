@@ -3,8 +3,31 @@ var winston = require("winston");
 var marked = require('marked');
 var Handlebars = require('handlebars');
 var fs = require("fs");
+var _ = require("underscore");
+var sugar = require("sugar");
+
+var metadataMarker = '@@'; //This should only exist here IMO
+var postsRoot = './posts/'; //TO a constant
+var templateRoot = './templates/'; //To a constant
+var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/; // Constant
+var postHeaderTemplate = null;
+var siteMetadata = {};
+
 
 module.exports = function () {
+
+    var PostFormatter = {};
+
+    //This has to move into something like a util package
+    function externalFilenameForFile(file, request) {
+        var hostname = request != undefined ? request.headers.host : '';
+
+        var retVal = hostname.length ? ('http://' + hostname) : '';
+        retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
+        retVal += file.replace('.md', '').replace(postsRoot, '').replace(postsRoot.replace('./', ''), '');
+        return retVal;
+    }
+
 
 
     function loadHeaderFooter(file, completion) {
@@ -22,7 +45,7 @@ module.exports = function () {
     // Parses the metadata in the file
     function parseMetadata(lines) {
         var retVal = {};
-
+        console.log("Lines is: " + lines);
         lines.each(function (line) {
             line = line.replace(metadataMarker, '');
             line = line.compact();
@@ -50,9 +73,9 @@ module.exports = function () {
         // Convert from markdown
         var body = performMetadataReplacements(replacements, marked(lines));
         // Perform replacements
-        var header = performMetadataReplacements(replacements, headerSource);
+        var header = performMetadataReplacements(replacements, PostFormatter.headerSource);
         // Concatenate HTML
-        return header + postHeader + body + footerSource;
+        return header + postHeader + body + PostFormatter.footerSource;
     }
 
 
@@ -88,10 +111,12 @@ module.exports = function () {
 
             // This relies on the above, so nest it.
             loadHeaderFooter('header.html', function (data) {
-                headerSource = performMetadataReplacements(siteMetadata, data);
+                console.log("Loading header source");
+                PostFormatter.headerSource = performMetadataReplacements(siteMetadata, data);
+                console.log("Header source: " + PostFormatter.headerSource);
             });
         });
-        loadHeaderFooter('footer.html', function (data) { footerSource = data; });
+        loadHeaderFooter('footer.html', function (data) { PostFormatter.footerSource = data; });
         loadHeaderFooter('postHeader.html', function (data) {
             Handlebars.registerHelper('formatPostDate', function (date) {
                 return new Handlebars.SafeString(new Date(date).format('{Weekday} {Month} {d}, {yyyy} at {h}:{mm} {TT}'));
@@ -101,9 +126,6 @@ module.exports = function () {
             });
             postHeaderTemplate = Handlebars.compile(data);
         });
-
-        // Kill the cache every 30 minutes.
-        setInterval(emptyCache, cacheResetTimeInMillis);
 
         marked.setOptions({
             renderer: new marked.Renderer(),
@@ -117,12 +139,15 @@ module.exports = function () {
         });
     }
 
-    var PostFormatter = {};
 
-    PostFormatter.performMetatadataReplacements = function performMetadataReplacements(replacements, haystack) {
+
+    var performMetadataReplacements = PostFormatter.performMetadataReplacements = function performMetadataReplacements(replacements, haystack) {
+        console.log("hi1");
         _.keys(replacements).each(function (key) {
             // Ensure that it's a global replacement; non-regex treatment is first-only.
+            // console.log("Key: " + key + "; haystack: " + haystack);
             haystack = haystack.replace(new RegExp(metadataMarker + key + metadataMarker, 'g'), replacements[key]);
+            console.log("hi2");
         });
 
         return haystack;
@@ -135,13 +160,17 @@ module.exports = function () {
 
     // Gets the metadata for this file
     PostFormatter.generateMetadataForFile = function generateMetadataForFile(file) {
+        console.log("Taco0: " + file);
         return generateHtmlAndMetadataForFile(file)['metadata'];
     }
 
     // Gets the metadata & rendered HTML for this file
-    PostFormatter.generateHtmlAndMetadataForFile = function generateHtmlAndMetadataForFile(file) {
-        var retVal = fetchFromCache(file);
+    var generateHtmlAndMetadataForFile =  PostFormatter.generateHtmlAndMetadataForFile = function generateHtmlAndMetadataForFile(file) {
+        // var retVal = fetchFromCache(file);
+        var retVal;
+        console.log("Taco1");
         if (retVal == undefined) {
+            console.log("Taco2");
             var lines = getLinesFromPost(file);
             var metadata = parseMetadata(lines['metadata']);
             metadata['relativeLink'] = externalFilenameForFile(file);
@@ -150,16 +179,27 @@ module.exports = function () {
             if (postRegex.test(file)) {
                 metadata['BodyClass'] = 'post';
             }
+            console.log("Taco3");
             var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
-            addRenderedPostToCache(file, {
-                metadata: metadata,
-                body: html,
-                unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)) }
-            );
+            // addRenderedPostToCache(file, {
+            //     metadata: metadata,
+            //     body: html,
+            //     unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)) }
+            // );
         }
 
-        return fetchFromCache(file);
+        // return fetchFromCache(file);
+        var toReturn =  {
+            metadata: metadata,
+            body: html,
+            unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file))
+        };
+        // console.log("Returning: " + JSON.stringify(toReturn));
+        return toReturn;
     }
+
+    init();
+    // console.log("HEader source: " + headerSource);
 
     return PostFormatter;
 }

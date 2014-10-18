@@ -8,6 +8,8 @@ var http = require('http');
 var fs = require('fs');
 var qfs = require('q-io/fs');
 var _ = require('underscore');
+var sugar = require("sugar");
+var Handlebars = require("handlebars");
 
 var rss = require('rss');
 
@@ -33,62 +35,24 @@ var renderedRss = {};
 var allPostsSortedGrouped = {};
 var headerSource = undefined;
 var footerSource = null;
-var postHeaderTemplate = null;
+// var postHeaderTemplate = null;
 var siteMetadata = {};
+
+var postFormatter = require("./PostFormatter")();
 
 /***************************************************
  * HELPER METHODS                                  *
  ***************************************************/
 
 function init() {
-    loadHeaderFooter('defaultTags.html', function (data) {
-        // Note this comes in as a flat string; split on newlines for parsing metadata.
-        siteMetadata = parseMetadata(data.split('\n'));
-
-        // This relies on the above, so nest it.
-        loadHeaderFooter('header.html', function (data) {
-            headerSource = performMetadataReplacements(siteMetadata, data);
-        });
-    });
-    loadHeaderFooter('footer.html', function (data) { footerSource = data; });
-    loadHeaderFooter('postHeader.html', function (data) {
-        Handlebars.registerHelper('formatPostDate', function (date) {
-            return new Handlebars.SafeString(new Date(date).format('{Weekday} {Month} {d}, {yyyy} at {h}:{mm} {TT}'));
-        });
-        Handlebars.registerHelper('formatIsoDate', function (date) {
-            return new Handlebars.SafeString(date !== undefined ? new Date(date).iso() : '');
-        });
-        postHeaderTemplate = Handlebars.compile(data);
-    });
-
     // Kill the cache every 30 minutes.
     setInterval(emptyCache, cacheResetTimeInMillis);
-
-    marked.setOptions({
-        renderer: new marked.Renderer(),
-        gfm: true,
-        tables: true,
-        smartLists: true,
-        smartypants: true,
-        highlight: function (code) {
-            return require('highlight.js').highlightAuto(code).value;
-          }
-    });
 }
 
-// function loadHeaderFooter(file, completion) {
-//     fs.exists(templateRoot + file, function(exists) {
-//         if (exists) {
-//             fs.readFile(templateRoot + file, {encoding: 'UTF8'}, function (error, data) {
-//                 if (!error) {
-//                     completion(data);
-//                 }
-//             });
-//         }
-//     });
-// }
 
+//Used for caching
 function normalizedFileName(file) {
+    console.log("File is" + file);
     var retVal = file;
     if (file.startsWith('posts')) {
         retVal = './' + file;
@@ -115,106 +79,6 @@ function fetchFromCache(file) {
     return renderedPosts[normalizedFileName(file)] || null;
 }
 
-// // Parses the metadata in the file
-// function parseMetadata(lines) {
-//     var retVal = {};
-//
-//     lines.each(function (line) {
-//         line = line.replace(metadataMarker, '');
-//         line = line.compact();
-//         if (line.has('=')) {
-//             var firstIndex = line.indexOf('=');
-//             retVal[line.first(firstIndex)] = line.from(firstIndex + 1);
-//         }
-//     });
-//
-//     // NOTE: Some metadata is added in generateHtmlAndMetadataForFile().
-//
-//     // Merge with site default metadata
-//     Object.merge(retVal, siteMetadata, false, function(key, targetVal, sourceVal) {
-//         // Ensure that the file wins over the defaults.
-//         console.log('overwriting "' + sourceVal + '" with "' + targetVal);
-//         return targetVal;
-//     });
-//
-//     return retVal;
-// }
-
-// function performMetadataReplacements(replacements, haystack) {
-//     _.keys(replacements).each(function (key) {
-//         // Ensure that it's a global replacement; non-regex treatment is first-only.
-//         haystack = haystack.replace(new RegExp(metadataMarker + key + metadataMarker, 'g'), replacements[key]);
-//     });
-//
-//     return haystack;
-// }
-
-// // Parses the HTML and renders it.
-// function parseHtml(lines, replacements, postHeader) {
-//     // Convert from markdown
-//     var body = performMetadataReplacements(replacements, marked(lines));
-//     // Perform replacements
-//     var header = performMetadataReplacements(replacements, headerSource);
-//     // Concatenate HTML
-//     return header + postHeader + body + footerSource;
-// }
-
-// // Gets all the lines in a post and separates the metadata from the body
-// function getLinesFromPost(file) {
-//     file = file.endsWith('.md') ? file : file + '.md';
-//     var data = fs.readFileSync(file, {encoding: 'UTF8'});
-//
-//     // Extract the pieces
-//     var lines = data.lines();
-//     var metadataLines = _.filter(lines, function (line) { return line.startsWith(metadataMarker); });
-//     var body = _.difference(lines, metadataLines).join('\n');
-//
-//     return {metadata: metadataLines, body: body};
-// }
-
-
-
-// // Gets the metadata & rendered HTML for this file
-// function generateHtmlAndMetadataForFile(file) {
-//     var retVal = fetchFromCache(file);
-//     if (retVal == undefined) {
-//         var lines = getLinesFromPost(file);
-//         var metadata = parseMetadata(lines['metadata']);
-//         metadata['relativeLink'] = externalFilenameForFile(file);
-//         metadata['header'] = postHeaderTemplate(metadata);
-//         // If this is a post, assume a body class of 'post'.
-//         if (postRegex.test(file)) {
-//             metadata['BodyClass'] = 'post';
-//         }
-//         var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
-//         addRenderedPostToCache(file, {
-//             metadata: metadata,
-//             body: html,
-//             unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)) }
-//         );
-//     }
-//
-//     return fetchFromCache(file);
-// }
-
-// Gets the metadata for this file
-function generateMetadataForFile(file) {
-    return generateHtmlAndMetadataForFile(file)['metadata'];
-}
-
-// Gets the rendered HTML for this file, with header/footer.
-function generateHtmlForFile(file) {
-    return generateHtmlAndMetadataForFile(file)['body'];
-}
-
-// Gets the body HTML for this file, no header/footer.
-function generateBodyHtmlForFile(file) {
-    var parts = getLinesFromPost(file);
-    var body = marked(parts['body']);
-    var metadata = parseMetadata(parts['metadata']);
-    metadata['relativeLink'] = externalFilenameForFile(file);
-    return body;
-}
 
 // Gets the external link for this file. Relative if request is
 // not specified. Absolute if request is specified.
@@ -245,24 +109,31 @@ function externalFilenameForFile(file, request) {
 //                +-- ...
 //                `-- (Article Object)
 function allPostsSortedAndGrouped(completion) {
+    console.log("HERE4");
     if (Object.size(allPostsSortedGrouped) != 0) {
+        console.log("HERE5");
         completion(allPostsSortedGrouped);
     } else {
+        console.log("Here6");
         qfs.listTree(postsRoot, function (name, stat) {
+            console.log("HERE7");
             return postRegex.test(name);
         }).then(function (files) {
+            console.log("HERE8");
             // Lump the posts together by day
             var groupedFiles = _.groupBy(files, function (file) {
+                console.log("HERE9");
                 var parts = file.split('/');
                 return new Date(parts[1], parts[2] - 1, parts[3]);
             });
 
             // Sort the days from newest to oldest
+            console.log("HERE10");
             var retVal = [];
             var sortedKeys = _.sortBy(_.keys(groupedFiles), function (date) {
                 return new Date(date);
             }).reverse();
-
+            console.log("HERE11");
             // For each day...
             _.each(sortedKeys, function (key) {
                 // Get all the filenames...
@@ -270,7 +141,7 @@ function allPostsSortedAndGrouped(completion) {
                 var articles = [];
                 // ...get all the data for that file ...
                 _.each(articleFiles, function (file) {
-                    articles.push(generateHtmlAndMetadataForFile(file));
+                    articles.push(postFormatter.generateHtmlAndMetadataForFile(file));
                 });
 
                 // ...so we can sort the posts...
@@ -297,7 +168,9 @@ function allPostsSortedAndGrouped(completion) {
 // Forcing to exactly 10 posts per page seemed artificial, and,
 // frankly, harder.
 function allPostsPaginated(completion) {
+    console.log("HERE2");
     allPostsSortedAndGrouped(function (postsByDay) {
+        console.log("HERE3");
         var pages = [];
         var thisPageDays = [];
         var count = 0;
@@ -419,6 +292,7 @@ function baseRouteHandler(file, sender, generator) {
     if (fetchFromCache(file) == null) {
         console.log('Not in cache: ' + file);
         generator(function (postData) {
+            console.log("HERE");
             addRenderedPostToCache(file, {body: postData});
             sender({body: postData});
         });
@@ -447,7 +321,7 @@ app.get('/', function (request, response) {
     baseRouteHandler('/?p=' + page, function (cachedData) {
         response.send(cachedData['body']);
     }, function (completion) {
-        var indexInfo = generateHtmlAndMetadataForFile(postsRoot + 'index.md');
+        var indexInfo = postFormatter.generateHtmlAndMetadataForFile(postsRoot + 'index.md');
         Handlebars.registerHelper('formatDate', function (date) {
             return new Handlebars.SafeString(new Date(date).format('{Weekday}<br />{d}<br />{Month}<br />{yyyy}'));
         });
@@ -460,16 +334,20 @@ app.get('/', function (request, response) {
         var footerTemplate = Handlebars.compile(indexInfo['metadata']['FooterTemplate']);
 
         var bodyHtml = '';
+        console.log("BLAH");
         allPostsPaginated(function (pages) {
+            console.log("HERE0");
             // If we're asking for a page that doesn't exist, redirect.
             if (page < 0 || page > pages.length) {
+                console.log("BLAH1")
                 response.redirect(pages.length > 1 ? '/?p=' + pages.length : '/');
             }
+            console.log("blah2");
             var days = pages[page - 1]['days'];
             days.forEach(function (day) {
                 bodyHtml += dayTemplate(day);
             });
-
+            console.log("blah3");
             // If we have more data to display, set up footer links.
             var footerData = {};
             if (page > 1) {
@@ -478,16 +356,24 @@ app.get('/', function (request, response) {
             if (pages.length > page) {
                 footerData['nextPage'] = page + 1;
             }
-
-            var metadata = generateMetadataForFile(postsRoot + 'index.md');
-            var header = performMetadataReplacements(metadata, headerSource);
+            console.log("Blah4");
+            var metadata = postFormatter.generateMetadataForFile(postsRoot + 'index.md');
+            console.log("blah7");
+            console.log(postFormatter.headerSource);
+            var header = postFormatter.performMetadataReplacements(metadata, postFormatter.headerSource);
             // Replace <title>...</title> with one-off for homepage, because it doesn't show both Page & Site titles.
+            console.log("blah6");
             var titleBegin = header.indexOf('<title>') + "<title>".length;
+            console.log("blah8");
             var titleEnd = header.indexOf('</title>');
+            console.log("blah9");
             header = header.substring(0, titleBegin) + metadata['SiteTitle'] + header.substring(titleEnd);
+            console.log("blah10");
             // Carry on with body
-            bodyHtml = performMetadataReplacements(metadata, bodyHtml);
-            var fullHtml = header + bodyHtml + footerTemplate(footerData) + footerSource;
+            bodyHtml = postFormatter.performMetadataReplacements(metadata, bodyHtml);
+            console.log("blah11");
+            var fullHtml = header + bodyHtml + footerTemplate(footerData) + postFormatter.footerSource;
+            console.log("blah5");
             completion(fullHtml);
         });
     });
