@@ -12,7 +12,7 @@ var _ = require('underscore');
 var marked = require('marked');
 var rss = require('rss');
 var Handlebars = require('handlebars');
-
+var mkdirp = require('mkdirp');
 var app = express();
 app.use(compress());
 app.use(express.static("public"));
@@ -179,12 +179,14 @@ function publishPendingPosts(callback) {
             callback(err);
         } else {
             async.each(files, function (file, callback) {
+
                 var fullFilename = pendingPostsRoot + file;
                 var lines = getLinesFromPost(fullFilename);
                 var metadata = parseMetadata(lines['metadata']);
                 var pubDate = Date.create(metadata['Date']);
                 var link = postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{MM}") + '/' + pubDate.format('{dd}') + '/';
-                fs.mkdir(link, function (err) {
+                mkdirp(link, function (err) {
+                    console.log("HERE" + err);
                     fs.rename(fullFilename, link + file, function (err) {
                         console.log(err);
                         callback(err);
