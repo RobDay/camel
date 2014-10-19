@@ -32,6 +32,18 @@ module.exports = function () {
         return retVal;
     }
 
+    //TODO: This is a duplicate...get rid of it.
+    //It is only required for the rss nonsense because we're not  using a cache
+    function normalizedFileName(file) {
+        console.log("File is" + file);
+        var retVal = file;
+        if (file.startsWith('posts')) {
+            retVal = './' + file;
+        }
+        retVal = retVal.replace('.md', '');
+
+        return retVal;
+    }
 
 
     function loadHeaderFooter(file, completion) {
@@ -146,12 +158,10 @@ module.exports = function () {
 
 
     var performMetadataReplacements = PostFormatter.performMetadataReplacements = function performMetadataReplacements(replacements, haystack) {
-        console.log("hi1");
         _.keys(replacements).each(function (key) {
             // Ensure that it's a global replacement; non-regex treatment is first-only.
             // console.log("Key: " + key + "; haystack: " + haystack);
             haystack = haystack.replace(new RegExp(metadataMarker + key + metadataMarker, 'g'), replacements[key]);
-            console.log("hi2");
         });
 
         return haystack;
@@ -199,7 +209,8 @@ module.exports = function () {
             unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file))
         };
         // console.log("Returning: " + JSON.stringify(toReturn));
-        return toReturn;
+        return _.extend({ file: normalizedFileName(file), date: new Date() }, toReturn);
+        // return toReturn;
     }
 
     init();

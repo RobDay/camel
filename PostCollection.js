@@ -4,6 +4,7 @@ var postsRoot = './posts/'; //Duplicate
 var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/; //Duplicate
 var metadataMarker = '@@'; //Duplicate
 var _ = require("underscore");
+var utcOffset = 5;
 var postFormatter = require("./PostFormatter")();
 var postsPerPage = 10;
 
@@ -22,6 +23,7 @@ module.exports = function() {
         var hostname = request != undefined ? request.headers.host : '';
 
         var retVal = hostname.length ? ('http://' + hostname) : '';
+        console.log("File is: " + file);
         retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
         retVal += file.replace('.md', '').replace(postsRoot, '').replace(postsRoot.replace('./', ''), '');
         return retVal;
@@ -47,7 +49,8 @@ module.exports = function() {
     //                `-- (Article Object)
     PostCollection.allPostsSortedAndGrouped = function allPostsSortedAndGrouped(completion) {
         console.log("HERE4");
-        if (Object.size(allPostsSortedGrouped) != 0) {
+        //TODO: Remove teh false
+        if (false && Object.size(allPostsSortedGrouped) != 0) {
             console.log("HERE5");
             completion(allPostsSortedGrouped);
         } else {
@@ -203,6 +206,7 @@ module.exports = function() {
                     day['articles'].forEach(function (article) {
                         if (i < max) {
                             ++i;
+                            console.log("Arcile is" + JSON.stringify(article));
                             feed.item({
                                 title: article['metadata']['Title'],
                                 // Offset the time because Heroku's servers are GMT, whereas these dates are EST/EDT.
