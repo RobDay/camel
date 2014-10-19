@@ -129,7 +129,6 @@ module.exports = function () {
             loadHeaderFooter('header.html', function (data) {
                 console.log("Loading header source");
                 PostFormatter.headerSource = performMetadataReplacements(PostFormatter.siteMetadata, data);
-                console.log("Header source: " + PostFormatter.headerSource);
             });
         });
         loadHeaderFooter('footer.html', function (data) { PostFormatter.footerSource = data; });
@@ -172,12 +171,6 @@ module.exports = function () {
         return generateHtmlAndMetadataForFile(file)['body'];
     }
 
-    // // Gets the metadata for this file
-    // PostFormatter.generateMetadataForFile = function generateMetadataForFile(file) {
-    //     console.log("Taco0: " + file);
-    //     return generateHtmlAndMetadataForFile(file)['metadata'];
-    // }
-
     // Gets the metadata & rendered HTML for this file
     var generateHtmlAndMetadataForFile =  PostFormatter.generateHtmlAndMetadataForFile = function generateHtmlAndMetadataForFile(file) {
         // var retVal = fetchFromCache(file);
@@ -210,13 +203,10 @@ module.exports = function () {
             file: normalizedFileName(file),
             date: new Date()
         };
-        // console.log("Returning: " + JSON.stringify(toReturn));
-        // return _.extend({ file: normalizedFileName(file), date: new Date() }, toReturn);
         return toReturn;
     }
 
     init();
-    // console.log("HEader source: " + headerSource);
 
     return PostFormatter;
 }

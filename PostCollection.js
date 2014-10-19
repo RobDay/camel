@@ -177,7 +177,7 @@ module.exports = function() {
 
     PostCollection.postForFile = function(file) {
         //TODO: This needs to check the cache
-        var html = postFormatter.generateHtmlAndMetadataForFile(file);
+        var html = postFormatter.generateHtmlForFile(file);
         return html;
     }
 
