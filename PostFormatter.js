@@ -11,7 +11,7 @@ var postsRoot = './posts/'; //TO a constant
 var templateRoot = './templates/'; //To a constant
 var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/; // Constant
 var postHeaderTemplate = null;
-var siteMetadata = {};
+
 
 // var postCache = require("./PostCache")();
 
@@ -19,6 +19,8 @@ var siteMetadata = {};
 module.exports = function () {
 
     var PostFormatter = {};
+    //TODO: Metadata doesn't belong here.
+    PostFormatter.siteMetadata = {};
 
     //This has to move into something like a util package
     function externalFilenameForFile(file, request) {
@@ -60,7 +62,7 @@ module.exports = function () {
         // NOTE: Some metadata is added in generateHtmlAndMetadataForFile().
 
         // Merge with site default metadata
-        Object.merge(retVal, siteMetadata, false, function(key, targetVal, sourceVal) {
+        Object.merge(retVal, PostFormatter.siteMetadata, false, function(key, targetVal, sourceVal) {
             // Ensure that the file wins over the defaults.
             console.log('overwriting "' + sourceVal + '" with "' + targetVal);
             return targetVal;
@@ -109,12 +111,12 @@ module.exports = function () {
     function init() {
         loadHeaderFooter('defaultTags.html', function (data) {
             // Note this comes in as a flat string; split on newlines for parsing metadata.
-            siteMetadata = parseMetadata(data.split('\n'));
+            PostFormatter.siteMetadata = parseMetadata(data.split('\n'));
 
             // This relies on the above, so nest it.
             loadHeaderFooter('header.html', function (data) {
                 console.log("Loading header source");
-                PostFormatter.headerSource = performMetadataReplacements(siteMetadata, data);
+                PostFormatter.headerSource = performMetadataReplacements(PostFormatter.siteMetadata, data);
                 console.log("Header source: " + PostFormatter.headerSource);
             });
         });
@@ -160,11 +162,11 @@ module.exports = function () {
         return generateHtmlAndMetadataForFile(file)['body'];
     }
 
-    // Gets the metadata for this file
-    PostFormatter.generateMetadataForFile = function generateMetadataForFile(file) {
-        console.log("Taco0: " + file);
-        return generateHtmlAndMetadataForFile(file)['metadata'];
-    }
+    // // Gets the metadata for this file
+    // PostFormatter.generateMetadataForFile = function generateMetadataForFile(file) {
+    //     console.log("Taco0: " + file);
+    //     return generateHtmlAndMetadataForFile(file)['metadata'];
+    // }
 
     // Gets the metadata & rendered HTML for this file
     var generateHtmlAndMetadataForFile =  PostFormatter.generateHtmlAndMetadataForFile = function generateHtmlAndMetadataForFile(file) {

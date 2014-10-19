@@ -11,7 +11,7 @@ var _ = require('underscore');
 var sugar = require("sugar");
 var Handlebars = require("handlebars");
 
-var rss = require('rss');
+// var rss = require('rss');
 
 var mkdirp = require('mkdirp');
 var app = express();
@@ -32,10 +32,9 @@ var utcOffset = 5;
 // var renderedPosts = {};
 var renderedRss = {};
 // var allPostsSortedGrouped = {};
-var headerSource = undefined;
 var footerSource = null;
 // var postHeaderTemplate = null;
-var siteMetadata = {};
+// var siteMetadata = {};
 
 var postFormatter = require("./PostFormatter")();
 var postCollection = require("./PostCollection")();
@@ -92,26 +91,6 @@ function loadAndSendMarkdownFile(file, response) {
         var html = postCollection.postForFile(file);
         response.send(200, html);
     }
-
-    // else if (fetchFromCache(file) != null) {
-    //     // Send the cached version.
-    //     console.log('Sending cached file: ' + file);
-    //     response.send(200, fetchFromCache(file)['body']);
-    //     return;
-    // } else {
-    //     // Fetch the real deal.
-    //     fs.exists(file + '.md', function (exists) {
-    //         if (!exists) {
-    //             console.log('404: ' + file);
-    //             response.send(404, {error: 'A post with that address is not found.'});
-    //             return;
-    //         }
-    //
-    //         console.log('Sending file: ' + file)
-    //         var html = generateHtmlForFile(file);
-    //         response.send(200, html);
-    //     });
-    // }
 }
 
 // Handles a route by trying the cache first.
@@ -154,32 +133,20 @@ app.get('/', function (request, response) {
         response.send(cachedData['body']);
     }, function (completion) {
         var indexInfo = postFormatter.generateHtmlAndMetadataForFile(postsRoot + 'index.md');
-        Handlebars.registerHelper('formatDate', function (date) {
-            return new Handlebars.SafeString(new Date(date).format('{Weekday}<br />{d}<br />{Month}<br />{yyyy}'));
-        });
-        Handlebars.registerHelper('dateLink', function (date) {
-            var parsedDate = new Date(date);
-            return '/' + parsedDate.format("{yyyy}") + '/' + parsedDate.format("{M}") + '/' + parsedDate.format('{d}') + '/';
-        });
         Handlebars.registerPartial('article', indexInfo['metadata']['ArticlePartial']);
         var dayTemplate = Handlebars.compile(indexInfo['metadata']['DayTemplate']);
         var footerTemplate = Handlebars.compile(indexInfo['metadata']['FooterTemplate']);
 
         var bodyHtml = '';
-        console.log("BLAH");
         postCollection.allPostsPaginated(function (pages) {
-            console.log("HERE0");
             // If we're asking for a page that doesn't exist, redirect.
             if (page < 0 || page > pages.length) {
-                console.log("BLAH1")
                 response.redirect(pages.length > 1 ? '/?p=' + pages.length : '/');
             }
-            console.log("blah2");
             var days = pages[page - 1]['days'];
             days.forEach(function (day) {
                 bodyHtml += dayTemplate(day);
             });
-            console.log("blah3");
             // If we have more data to display, set up footer links.
             var footerData = {};
             if (page > 1) {
@@ -188,24 +155,15 @@ app.get('/', function (request, response) {
             if (pages.length > page) {
                 footerData['nextPage'] = page + 1;
             }
-            console.log("Blah4");
-            var metadata = postFormatter.generateMetadataForFile(postsRoot + 'index.md');
-            console.log("blah7");
-            console.log(postFormatter.headerSource);
+            var metadata = indexInfo['metadata'];
             var header = postFormatter.performMetadataReplacements(metadata, postFormatter.headerSource);
             // Replace <title>...</title> with one-off for homepage, because it doesn't show both Page & Site titles.
-            console.log("blah6");
             var titleBegin = header.indexOf('<title>') + "<title>".length;
-            console.log("blah8");
             var titleEnd = header.indexOf('</title>');
-            console.log("blah9");
             header = header.substring(0, titleBegin) + metadata['SiteTitle'] + header.substring(titleEnd);
-            console.log("blah10");
             // Carry on with body
             bodyHtml = postFormatter.performMetadataReplacements(metadata, bodyHtml);
-            console.log("blah11");
             var fullHtml = header + bodyHtml + footerTemplate(footerData) + postFormatter.footerSource;
-            console.log("blah5");
             completion(fullHtml);
         });
     });
@@ -213,50 +171,8 @@ app.get('/', function (request, response) {
 
 app.get('/rss', function (request, response) {
     response.type('application/rss+xml');
-    if (renderedRss['date'] == undefined || new Date().getTime() - renderedRss['date'].getTime() > 3600000) {
-        var feed = new rss({
-            title: siteMetadata['SiteTitle'],
-            description: 'Posts to ' + siteMetadata['SiteTitle'],
-            feed_url: 'http://www.yoursite.com/rss',
-            site_url: 'http://www.yoursite.com',
-            author: 'Your Name',
-            webMaster: 'Your Name',
-            copyright: '2013-' + new Date().getFullYear() + ' Your Name',
-            image_url: 'http://www.yoursite.com/images/favicon.png',
-            language: 'en',
-            //categories: ['Category 1','Category 2','Category 3'],
-            pubDate: new Date().toString(),
-            ttl: '60'
-        });
-
-        var max = 10;
-        var i = 0;
-        postCollection.allPostsSortedAndGrouped(function (postsByDay) {
-            postsByDay.forEach(function (day) {
-                day['articles'].forEach(function (article) {
-                    if (i < max) {
-                        ++i;
-                        feed.item({
-                            title: article['metadata']['Title'],
-                            // Offset the time because Heroku's servers are GMT, whereas these dates are EST/EDT.
-                            date: new Date(article['metadata']['Date']).addHours(utcOffset),
-                            url: externalFilenameForFile(article['file'], request),
-                            description: article['unwrappedBody'].replace(/<script[\s\S]*?<\/script>/gm, "")
-                        });
-                    }
-                });
-            });
-
-            renderedRss = {
-                date: new Date(),
-                rss: feed.xml()
-            };
-
-            response.send(renderedRss['rss']);
-        });
-    } else {
-        response.send(renderedRss['rss']);
-    }
+    var rss = postCollection.getRss(request);
+    response.send(rss);
 });
 
 // Month view
@@ -364,6 +280,17 @@ app.get('/:slug', function (request, response) {
  * STARTUP                                         *
  ***************************************************/
 // init();
+function setupHandlebars() {
+    Handlebars.registerHelper('formatDate', function (date) {
+        return new Handlebars.SafeString(new Date(date).format('{Weekday}<br />{d}<br />{Month}<br />{yyyy}'));
+    });
+    Handlebars.registerHelper('dateLink', function (date) {
+        var parsedDate = new Date(date);
+        return '/' + parsedDate.format("{yyyy}") + '/' + parsedDate.format("{M}") + '/' + parsedDate.format('{d}') + '/';
+    });
+}
+
+setupHandlebars();
 var port = Number(process.env.PORT || 5000);
 server.listen(port, function () {
    console.log('Express server started on port %s', server.address().port);

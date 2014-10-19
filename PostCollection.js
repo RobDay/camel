@@ -7,10 +7,12 @@ var _ = require("underscore");
 var postFormatter = require("./PostFormatter")();
 var postsPerPage = 10;
 
+var rss = require('rss');
+
 
 module.exports = function() {
-    var PostCollection = {}
-
+    var PostCollection = {};
+    var renderedRss = {};
     var allPostsSortedGrouped = {};
 
     //Duplicate
@@ -171,8 +173,59 @@ module.exports = function() {
     }
 
     PostCollection.postForFile = function(file) {
+        //TODO: This needs to check the cache
         var html = postFormatter.generateHtmlForFile(file);
         return html;
+    }
+
+    //TODO: Fix RSS.. it is pissed about the favicon
+    PostCollection.getRss = function (request) {
+        if (renderedRss['date'] == undefined || new Date().getTime() - renderedRss['date'].getTime() > 3600000) {
+            var feed = new rss({
+                title: postFormatter.siteMetadata['SiteTitle'],
+                description: 'Posts to ' + postFormatter.siteMetadata['SiteTitle'],
+                feed_url: 'http://www.developingday.com/rss',
+                site_url: 'http://www.developingday.com',
+                author: 'Robert Day',
+                webMaster: 'Robert Day',
+                copyright: '2014-' + new Date().getFullYear() + ' Robert Day',
+                image_url: 'http://www.blah.com/images/favicon.png',
+                language: 'en',
+                //categories: ['Category 1','Category 2','Category 3'],
+                pubDate: new Date().toString(),
+                ttl: '60'
+            });
+
+            var max = 10;
+            var i = 0;
+            PostCollection.allPostsSortedAndGrouped(function (postsByDay) {
+                postsByDay.forEach(function (day) {
+                    day['articles'].forEach(function (article) {
+                        if (i < max) {
+                            ++i;
+                            feed.item({
+                                title: article['metadata']['Title'],
+                                // Offset the time because Heroku's servers are GMT, whereas these dates are EST/EDT.
+                                date: new Date(article['metadata']['Date']).addHours(utcOffset),
+                                url: externalFilenameForFile(article['file'], request),
+                                description: article['unwrappedBody'].replace(/<script[\s\S]*?<\/script>/gm, "")
+                            });
+                        }
+                    });
+                });
+
+                renderedRss = {
+                    date: new Date(),
+                    rss: feed.xml()
+                };
+                return feed.xml();
+
+                // response.send(renderedRss['rss']);
+            });
+        } else {
+            return renderedRss['rss'];
+            // response.send(renderedRss['rss']);
+        }
     }
     return PostCollection;
 
