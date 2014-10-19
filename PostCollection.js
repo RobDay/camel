@@ -1,8 +1,9 @@
 var sugar = require("sugar");
 var qfs = require('q-io/fs');
+var config = require("./config");
 var postsRoot = './posts/'; //Duplicate
 var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/; //Duplicate
-var metadataMarker = '@@'; //Duplicate
+
 var _ = require("underscore");
 var utcOffset = 5;
 var postFormatter = require("./PostFormatter")();

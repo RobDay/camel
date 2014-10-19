@@ -5,11 +5,8 @@ var Handlebars = require('handlebars');
 var fs = require("fs");
 var _ = require("underscore");
 var sugar = require("sugar");
+var config = require('./config')
 
-var metadataMarker = '@@'; //This should only exist here IMO
-var postsRoot = './posts/'; //TO a constant
-var templateRoot = './templates/'; //To a constant
-var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/; // Constant
 var postHeaderTemplate = null;
 
 
@@ -28,7 +25,7 @@ module.exports = function () {
 
         var retVal = hostname.length ? ('http://' + hostname) : '';
         retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
-        retVal += file.replace('.md', '').replace(postsRoot, '').replace(postsRoot.replace('./', ''), '');
+        retVal += file.replace('.md', '').replace(config.postsRoot, '').replace(config.postsRoot.replace('./', ''), '');
         return retVal;
     }
 
@@ -46,9 +43,9 @@ module.exports = function () {
 
 
     function loadHeaderFooter(file, completion) {
-        fs.exists(templateRoot + file, function(exists) {
+        fs.exists(config.templateRoot + file, function(exists) {
             if (exists) {
-                fs.readFile(templateRoot + file, {encoding: 'UTF8'}, function (error, data) {
+                fs.readFile(config.templateRoot + file, {encoding: 'UTF8'}, function (error, data) {
                     if (!error) {
                         completion(data);
                     }
@@ -61,7 +58,7 @@ module.exports = function () {
     function parseMetadata(lines) {
         var retVal = {};
         lines.each(function (line) {
-            line = line.replace(metadataMarker, '');
+            line = line.replace(config.metadataMarker, '');
             line = line.compact();
             if (line.has('=')) {
                 var firstIndex = line.indexOf('=');
@@ -100,7 +97,7 @@ module.exports = function () {
 
         // Extract the pieces
         var lines = data.lines();
-        var metadataLines = _.filter(lines, function (line) { return line.startsWith(metadataMarker); });
+        var metadataLines = _.filter(lines, function (line) { return line.startsWith(config.metadataMarker); });
         var body = _.difference(lines, metadataLines).join('\n');
 
         return {metadata: metadataLines, body: body};
@@ -157,7 +154,7 @@ module.exports = function () {
         _.keys(replacements).each(function (key) {
             // Ensure that it's a global replacement; non-regex treatment is first-only.
             // console.log("Key: " + key + "; haystack: " + haystack);
-            haystack = haystack.replace(new RegExp(metadataMarker + key + metadataMarker, 'g'), replacements[key]);
+            haystack = haystack.replace(new RegExp(config.metadataMarker + key + config.metadataMarker, 'g'), replacements[key]);
         });
 
         return haystack;
@@ -178,7 +175,7 @@ module.exports = function () {
             metadata['relativeLink'] = externalFilenameForFile(file);
             metadata['header'] = postHeaderTemplate(metadata);
             // If this is a post, assume a body class of 'post'.
-            if (postRegex.test(file)) {
+            if (config.postRegex.test(file)) {
                 metadata['BodyClass'] = 'post';
             }
             var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));

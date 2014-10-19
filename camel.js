@@ -11,8 +11,6 @@ var _ = require('underscore');
 var sugar = require("sugar");
 var Handlebars = require("handlebars");
 
-// var rss = require('rss');
-
 var mkdirp = require('mkdirp');
 var app = express();
 app.use(compress());
@@ -20,13 +18,7 @@ app.use(express.static("public"));
 var server = http.createServer(app);
 
 // "Statics"
-var postsRoot = './posts/';
-var pendingPostsRoot = './pendingPosts/';
-var templateRoot = './templates/';
-var metadataMarker = '@@';
 var maxCacheSize = 50;
-var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/;
-var utcOffset = 5;
 // var cacheResetTimeInMillis = 1800000;
 
 // var renderedPosts = {};
@@ -36,6 +28,7 @@ var footerSource = null;
 // var postHeaderTemplate = null;
 // var siteMetadata = {};
 
+var config = require('./config');
 var postFormatter = require("./PostFormatter")();
 var postCollection = require("./PostCollection")();
 
@@ -51,7 +44,7 @@ function externalFilenameForFile(file, request) {
 
     var retVal = hostname.length ? ('http://' + hostname) : '';
     retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
-    retVal += file.replace('.md', '').replace(postsRoot, '').replace(postsRoot.replace('./', ''), '');
+    retVal += file.replace('.md', '').replace(config.postsRoot, '').replace(config.postsRoot.replace('./', ''), '');
     return retVal;
 }
 
@@ -132,7 +125,7 @@ app.get('/', function (request, response) {
     baseRouteHandler('/?p=' + page, function (cachedData) {
         response.send(cachedData['body']);
     }, function (completion) {
-        var indexInfo = postFormatter.generateHtmlAndMetadataForFile(postsRoot + 'index.md');
+        var indexInfo = postFormatter.generateHtmlAndMetadataForFile(config.postsRoot + 'index.md');
         Handlebars.registerPartial('article', indexInfo['metadata']['ArticlePartial']);
         var dayTemplate = Handlebars.compile(indexInfo['metadata']['DayTemplate']);
         var footerTemplate = Handlebars.compile(indexInfo['metadata']['FooterTemplate']);
@@ -177,7 +170,7 @@ app.get('/rss', function (request, response) {
 
 // Month view
 app.get('/:year/:month', function (request, response) {
-    var path = postsRoot + request.params.year + '/' + request.params.month;
+    var path = config.postsRoot + request.params.year + '/' + request.params.month;
 
     var postsByDay = {};
 
@@ -209,14 +202,14 @@ app.get('/:year/:month', function (request, response) {
              html += '</ul>';
          });
 
-         var header = headerSource.replace(metadataMarker + 'Title' + metadataMarker, "Day Listing");
+         var header = postFormatter.headerSource.replace(config.metadataMarker + 'Title' + config.metadataMarker, "Day Listing");
          response.send(header + html + footerSource);
     });
  });
 
 // Day view
 app.get('/:year/:month/:day', function (request, response) {
-    var path = postsRoot + request.params.year + '/' + request.params.month + '/' + request.params.day;
+    var path = config.postsRoot + request.params.year + '/' + request.params.month + '/' + request.params.day;
 
     // Get all the files in the directory
     fs.readdir(path, function (error, files) {
@@ -245,7 +238,7 @@ app.get('/:year/:month/:day', function (request, response) {
             html += '<li><a href="' + post['metadata']['relativeLink'] + '">' + post['metadata']['Title'] + '</a></li>';
         });
 
-        var header = headerSource.replace(metadataMarker + 'Title' + metadataMarker, day.format('{Weekday}, {Month} {d}'));
+        var header = postFormatter.headerSource.replace(config.metadataMarker + 'Title' + config.metadataMarker, day.format('{Weekday}, {Month} {d}'));
         response.send(header + html + footerSource);
     })
  });
@@ -253,7 +246,7 @@ app.get('/:year/:month/:day', function (request, response) {
 
 // Get a blog post, such as /2014/3/17/birthday
 app.get('/:year/:month/:day/:slug', function (request, response) {
-    var file = postsRoot + request.params.year + '/' + request.params.month + '/' + request.params.day + '/' + request.params.slug;
+    var file = config.postsRoot + request.params.year + '/' + request.params.month + '/' + request.params.day + '/' + request.params.slug;
 
     loadAndSendMarkdownFile(file, response);
 });
@@ -268,7 +261,7 @@ app.get('/:year/:month/:day/:slug', function (request, response) {
 app.get('/:slug', function (request, response) {
     // If this is a typical slug, send the file
     if (isNaN(request.params.slug)) {
-        var file = postsRoot + request.params.slug;
+        var file = config.postsRoot + request.params.slug;
         loadAndSendMarkdownFile(file, response);
     // If it's a year, handle that.
     } else {
