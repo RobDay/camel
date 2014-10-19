@@ -23,7 +23,6 @@ module.exports = function() {
         var hostname = request != undefined ? request.headers.host : '';
 
         var retVal = hostname.length ? ('http://' + hostname) : '';
-        console.log("File is: " + file);
         retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
         retVal += file.replace('.md', '').replace(postsRoot, '').replace(postsRoot.replace('./', ''), '');
         return retVal;
@@ -48,32 +47,24 @@ module.exports = function() {
     //                +-- ...
     //                `-- (Article Object)
     PostCollection.allPostsSortedAndGrouped = function allPostsSortedAndGrouped(completion) {
-        console.log("HERE4");
         //TODO: Remove teh false
         if (false && Object.size(allPostsSortedGrouped) != 0) {
-            console.log("HERE5");
             completion(allPostsSortedGrouped);
         } else {
-            console.log("Here6");
             qfs.listTree(postsRoot, function (name, stat) {
-                console.log("HERE7");
                 return postRegex.test(name);
             }).then(function (files) {
-                console.log("HERE8");
                 // Lump the posts together by day
                 var groupedFiles = _.groupBy(files, function (file) {
-                    console.log("HERE9");
                     var parts = file.split('/');
                     return new Date(parts[1], parts[2] - 1, parts[3]);
                 });
 
                 // Sort the days from newest to oldest
-                console.log("HERE10");
                 var retVal = [];
                 var sortedKeys = _.sortBy(_.keys(groupedFiles), function (date) {
                     return new Date(date);
                 }).reverse();
-                console.log("HERE11");
                 // For each day...
                 _.each(sortedKeys, function (key) {
                     // Get all the filenames...
@@ -109,25 +100,20 @@ module.exports = function() {
     // Forcing to exactly 10 posts per page seemed artificial, and,
     // frankly, harder.
     PostCollection.allPostsPaginated = function allPostsPaginated(completion) {
-        console.log("HERE2");
         PostCollection.allPostsSortedAndGrouped(function (postsByDay) {
-            console.log("HERE3");
             var pages = [];
             var thisPageDays = [];
             var count = 0;
             postsByDay.each(function (day) {
-                console.log("HERE4");
                 count += day['articles'].length;
                 thisPageDays.push(day);
                 // Reset count if need be
                 if (count >= postsPerPage) {
-                    console.log("HERE6");
                     pages.push({ page: pages.length + 1, days: thisPageDays });
                     thisPageDays = [];
                     count = 0;
                 }
             });
-            console.log("HERE5");
             if (thisPageDays.length > 0) {
                 pages.push({ page: pages.length + 1, days: thisPageDays});
             }
@@ -206,7 +192,6 @@ module.exports = function() {
                     day['articles'].forEach(function (article) {
                         if (i < max) {
                             ++i;
-                            console.log("Arcile is" + JSON.stringify(article));
                             feed.item({
                                 title: article['metadata']['Title'],
                                 // Offset the time because Heroku's servers are GMT, whereas these dates are EST/EDT.

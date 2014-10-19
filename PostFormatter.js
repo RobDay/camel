@@ -35,7 +35,6 @@ module.exports = function () {
     //TODO: This is a duplicate...get rid of it.
     //It is only required for the rss nonsense because we're not  using a cache
     function normalizedFileName(file) {
-        console.log("File is" + file);
         var retVal = file;
         if (file.startsWith('posts')) {
             retVal = './' + file;
@@ -61,7 +60,6 @@ module.exports = function () {
     // Parses the metadata in the file
     function parseMetadata(lines) {
         var retVal = {};
-        console.log("Lines is: " + lines);
         lines.each(function (line) {
             line = line.replace(metadataMarker, '');
             line = line.compact();
@@ -127,7 +125,6 @@ module.exports = function () {
 
             // This relies on the above, so nest it.
             loadHeaderFooter('header.html', function (data) {
-                console.log("Loading header source");
                 PostFormatter.headerSource = performMetadataReplacements(PostFormatter.siteMetadata, data);
             });
         });
@@ -175,9 +172,7 @@ module.exports = function () {
     var generateHtmlAndMetadataForFile =  PostFormatter.generateHtmlAndMetadataForFile = function generateHtmlAndMetadataForFile(file) {
         // var retVal = fetchFromCache(file);
         var retVal;
-        console.log("Taco1");
         if (retVal == undefined) {
-            console.log("Taco2");
             var lines = getLinesFromPost(file);
             var metadata = parseMetadata(lines['metadata']);
             metadata['relativeLink'] = externalFilenameForFile(file);
@@ -186,7 +181,6 @@ module.exports = function () {
             if (postRegex.test(file)) {
                 metadata['BodyClass'] = 'post';
             }
-            console.log("Taco3");
             var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
             // addRenderedPostToCache(file, {
             //     metadata: metadata,
