@@ -206,11 +206,13 @@ module.exports = function () {
         var toReturn =  {
             metadata: metadata,
             body: html,
-            unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file))
+            unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)),
+            file: normalizedFileName(file),
+            date: new Date()
         };
         // console.log("Returning: " + JSON.stringify(toReturn));
-        return _.extend({ file: normalizedFileName(file), date: new Date() }, toReturn);
-        // return toReturn;
+        // return _.extend({ file: normalizedFileName(file), date: new Date() }, toReturn);
+        return toReturn;
     }
 
     init();
