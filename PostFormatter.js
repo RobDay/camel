@@ -6,11 +6,7 @@ var fs = require("fs");
 var _ = require("underscore");
 var sugar = require("sugar");
 var config = require('./config')
-
 var postHeaderTemplate = null;
-
-
-// var postCache = require("./PostCache")();
 
 
 module.exports = function () {

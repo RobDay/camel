@@ -1,16 +1,13 @@
 var sugar = require("sugar");
 var qfs = require('q-io/fs');
-var config = require("./config");
-var postsRoot = './posts/'; //Duplicate
-var postRegex = /^(.\/)?posts\/\d{4}\/\d{1,2}\/\d{1,2}\/(\w|-)*(.md)?/; //Duplicate
-
-var _ = require("underscore");
-var utcOffset = 5;
-var postFormatter = require("./PostFormatter")();
-var postsPerPage = 10;
-
 var rss = require('rss');
+var _ = require("underscore");
 
+var config = require("./config");
+var postFormatter = require("./PostFormatter")();
+
+var utcOffset = 5;
+var postsPerPage = 10;
 
 module.exports = function() {
     var PostCollection = {};
@@ -25,7 +22,7 @@ module.exports = function() {
 
         var retVal = hostname.length ? ('http://' + hostname) : '';
         retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
-        retVal += file.replace('.md', '').replace(postsRoot, '').replace(postsRoot.replace('./', ''), '');
+        retVal += file.replace('.md', '').replace(config.postsRoot, '').replace(config.postsRoot.replace('./', ''), '');
         return retVal;
     }
 
@@ -52,8 +49,8 @@ module.exports = function() {
         if (false && Object.size(allPostsSortedGrouped) != 0) {
             completion(allPostsSortedGrouped);
         } else {
-            qfs.listTree(postsRoot, function (name, stat) {
-                return postRegex.test(name);
+            qfs.listTree(config.postsRoot, function (name, stat) {
+                return config.postRegex.test(name);
             }).then(function (files) {
                 // Lump the posts together by day
                 var groupedFiles = _.groupBy(files, function (file) {
@@ -156,7 +153,7 @@ module.exports = function() {
                 }
             });
 
-            var header = postFormatter.headerSource.replace(metadataMarker + 'Title' + metadataMarker, 'Posts for ' + year);
+            var header = postFormatter.headerSource.replace(config.metadataMarker + 'Title' + config.metadataMarker, 'Posts for ' + year);
             response.send(header + retVal + postFormatter.footerSource);
         });
 
@@ -168,7 +165,6 @@ module.exports = function() {
         return html;
     }
 
-    //TODO: Fix RSS.. it is pissed about the favicon
     PostCollection.getRss = function (request) {
         if (renderedRss['date'] == undefined || new Date().getTime() - renderedRss['date'].getTime() > 3600000) {
             var feed = new rss({

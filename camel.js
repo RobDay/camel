@@ -18,15 +18,8 @@ app.use(express.static("public"));
 var server = http.createServer(app);
 
 // "Statics"
-var maxCacheSize = 50;
-// var cacheResetTimeInMillis = 1800000;
-
-// var renderedPosts = {};
 var renderedRss = {};
-// var allPostsSortedGrouped = {};
 var footerSource = null;
-// var postHeaderTemplate = null;
-// var siteMetadata = {};
 
 var config = require('./config');
 var postFormatter = require("./PostFormatter")();

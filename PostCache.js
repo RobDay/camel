@@ -3,6 +3,7 @@ var sugar = require("sugar");
 var _ = require("underscore");
 
 var cacheResetTimeInMillis = 1800000;
+var maxCacheSize = 50;
 
 
 module.exports = function () {
