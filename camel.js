@@ -17,10 +17,6 @@ app.use(compress());
 app.use(express.static("public"));
 var server = http.createServer(app);
 
-// "Statics"
-var renderedRss = {};
-var footerSource = null;
-
 var config = require('./config');
 var postFormatter = require("./PostFormatter")();
 var postCollection = require("./PostCollection")();
@@ -196,7 +192,7 @@ app.get('/:year/:month', function (request, response) {
          });
 
          var header = postFormatter.headerSource.replace(config.metadataMarker + 'Title' + config.metadataMarker, "Day Listing");
-         response.send(header + html + footerSource);
+         response.send(header + html + postFormatter.footerSource);
     });
  });
 
@@ -232,7 +228,7 @@ app.get('/:year/:month/:day', function (request, response) {
         });
 
         var header = postFormatter.headerSource.replace(config.metadataMarker + 'Title' + config.metadataMarker, day.format('{Weekday}, {Month} {d}'));
-        response.send(header + html + footerSource);
+        response.send(header + html + PostFormatter.footerSource);
     })
  });
 
@@ -281,7 +277,3 @@ var port = Number(process.env.PORT || 5000);
 server.listen(port, function () {
    console.log('Express server started on port %s', server.address().port);
 });
-
-// publishPendingPosts(function (err) {
-//     console.log("Err is " + err);
-// })
