@@ -85,7 +85,7 @@ function baseRouteHandler(file, sender, generator) {
     // if (fetchFromCache(file) == null) {
         console.log('Not in cache: ' + file);
         generator(function (postData) {
-            console.log("HERE");
+            // console.log("HERE");
             // addRenderedPostToCache(file, {body: postData});
             sender({body: postData});
         });

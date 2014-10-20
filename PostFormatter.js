@@ -6,6 +6,7 @@ var fs = require("fs");
 var _ = require("underscore");
 var sugar = require("sugar");
 var config = require('./config')
+var postCache = require('./postCache')();
 var postHeaderTemplate = null;
 
 
@@ -152,7 +153,6 @@ module.exports = function () {
             // console.log("Key: " + key + "; haystack: " + haystack);
             haystack = haystack.replace(new RegExp(config.metadataMarker + key + config.metadataMarker, 'g'), replacements[key]);
         });
-
         return haystack;
     }
 
@@ -163,9 +163,9 @@ module.exports = function () {
 
     // Gets the metadata & rendered HTML for this file
     var generateHtmlAndMetadataForFile =  PostFormatter.generateHtmlAndMetadataForFile = function generateHtmlAndMetadataForFile(file) {
-        // var retVal = fetchFromCache(file);
-        var retVal;
+        var retVal = postCache.fetchFromCache(file);
         if (retVal == undefined) {
+            console.log("Dont have a cached copy of: " + file);
             var lines = getLinesFromPost(file);
             var metadata = parseMetadata(lines['metadata']);
             metadata['relativeLink'] = externalFilenameForFile(file);
@@ -180,17 +180,18 @@ module.exports = function () {
             //     body: html,
             //     unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)) }
             // );
+            retVal = {
+                metadata: metadata,
+                body: html,
+                unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)),
+                file: normalizedFileName(file),
+                date: new Date()
+            };
+            postCache.addRenderedPost(file, retVal);
+        } else {
+            console.log("Returning a cached copy of: " + file);
         }
-
-        // return fetchFromCache(file);
-        var toReturn =  {
-            metadata: metadata,
-            body: html,
-            unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)),
-            file: normalizedFileName(file),
-            date: new Date()
-        };
-        return toReturn;
+        return retVal;
     }
 
     init();

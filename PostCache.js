@@ -4,6 +4,7 @@ var _ = require("underscore");
 
 var cacheResetTimeInMillis = 1800000;
 var maxCacheSize = 50;
+var renderedPosts = {};
 
 
 module.exports = function () {
@@ -12,7 +13,6 @@ module.exports = function () {
 
     //Used for caching
     function normalizedFileName(file) {
-        console.log("File is" + file);
         var retVal = file;
         if (file.startsWith('posts')) {
             retVal = './' + file;
@@ -27,9 +27,9 @@ module.exports = function () {
     }
 
 
-    PostCache.addRenderedPostToCache = function addRenderedPostToCache(file, postData) {
+    PostCache.addRenderedPost = function addRenderedPost(file, postData) {
         //console.log('Adding to cache: ' + normalizedFileName(file));
-        renderedPosts[normalizedFileName(file)] = _.extend({ file: normalizedFileName(file), date: new Date() }, postData);
+        renderedPosts[normalizedFileName(file)] = postData;
 
         if (_.size(renderedPosts) > maxCacheSize) {
             var sorted = _.sortBy(renderedPosts, function (post) { return post['date']; });
