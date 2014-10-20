@@ -175,11 +175,6 @@ module.exports = function () {
                 metadata['BodyClass'] = 'post';
             }
             var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
-            // addRenderedPostToCache(file, {
-            //     metadata: metadata,
-            //     body: html,
-            //     unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)) }
-            // );
             retVal = {
                 metadata: metadata,
                 body: html,

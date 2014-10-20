@@ -5,13 +5,13 @@ var _ = require("underscore");
 
 var config = require("./config");
 var postFormatter = require("./PostFormatter")();
-
+var rssKey = 'rss';
 var utcOffset = 5;
 var postsPerPage = 10;
 
 module.exports = function() {
     var PostCollection = {};
-    var renderedRss = {};
+    // var renderedRss = {};
     var allPostsSortedGrouped = {};
 
     //Duplicate
@@ -166,7 +166,8 @@ module.exports = function() {
     }
 
     PostCollection.getRss = function (request) {
-        if (renderedRss['date'] == undefined || new Date().getTime() - renderedRss['date'].getTime() > 3600000) {
+        var renderedRss = postCache.fetchFromCache(rssKey);
+        if (renderedRss == undefined || renderedRss['date'] == undefined || new Date().getTime() - renderedRss['date'].getTime() > 3600000) {
             var feed = new rss({
                 title: postFormatter.siteMetadata['SiteTitle'],
                 description: 'Posts to ' + postFormatter.siteMetadata['SiteTitle'],
@@ -204,7 +205,9 @@ module.exports = function() {
                     date: new Date(),
                     rss: feed.xml()
                 };
+                postCache.addRenderedPost(rssKey, renderedRss);
                 return feed.xml();
+
 
                 // response.send(renderedRss['rss']);
             });
