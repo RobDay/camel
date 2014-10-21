@@ -6,7 +6,7 @@ var fs = require("fs");
 var _ = require("underscore");
 var sugar = require("sugar");
 var config = require('./config')
-var postCache = require('./postCache')();
+var postCache = require('./postCache');
 var postHeaderTemplate = null;
 
 

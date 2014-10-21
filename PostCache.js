@@ -7,8 +7,7 @@ var maxCacheSize = 50;
 var renderedPosts = {};
 
 
-module.exports = function () {
-    var PostCache = {};
+module.exports = (function () {
 
 
     //Used for caching
@@ -22,38 +21,28 @@ module.exports = function () {
         return retVal;
     }
 
-    PostCache.fetchFromCache = function fetchFromCache(file) {
-        return renderedPosts[normalizedFileName(file)] || null;
-    }
+    var postCache = {
+        fetchFromCache: function(file) {
+            return renderedPosts[normalizedFileName(file)] || null;
+        },
+        addRenderedPost: function(file, postData) {
+            //console.log('Adding to cache: ' + normalizedFileName(file));
+            renderedPosts[normalizedFileName(file)] = postData;
 
-
-    PostCache.addRenderedPost = function addRenderedPost(file, postData) {
-        //console.log('Adding to cache: ' + normalizedFileName(file));
-        renderedPosts[normalizedFileName(file)] = postData;
-
-        if (_.size(renderedPosts) > maxCacheSize) {
-            var sorted = _.sortBy(renderedPosts, function (post) { return post['date']; });
-            delete renderedPosts[sorted.first()['file']];
+            if (_.size(renderedPosts) > maxCacheSize) {
+                var sorted = _.sortBy(renderedPosts, function (post) { return post['date']; });
+                delete renderedPosts[sorted.first()['file']];
+            }
+            //console.log('Cache has ' + JSON.stringify(_.keys(renderedPosts)));
+        },
+        emptyCache: function () {
+            console.log('Emptying the cache.');
+            renderedPosts = {};
+            // renderedRss = {};
+            // allPostsSortedGrouped = {};
         }
-        //console.log('Cache has ' + JSON.stringify(_.keys(renderedPosts)));
-    }
+    };
+    setInterval(postCache.emptyCache, cacheResetTimeInMillis);
+    return postCache
 
-
-    // Empties the caches.
-    PostCache.emptyCache = function emptyCache() {
-        console.log('Emptying the cache.');
-        renderedPosts = {};
-        // renderedRss = {};
-        // allPostsSortedGrouped = {};
-    }
-
-
-    function init() {
-        // Kill the cache every 30 minutes.
-        setInterval(PostCache.emptyCache, cacheResetTimeInMillis);
-    }
-
-    init();
-    return PostCache
-
-}
+})();

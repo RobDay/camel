@@ -20,7 +20,7 @@ var server = http.createServer(app);
 var config = require('./config');
 var postFormatter = require("./PostFormatter")();
 var postCollection = require("./PostCollection")();
-var postCache = require("./PostCache")();
+var postCache = require("./PostCache");
 
 /***************************************************
  * HELPER METHODS                                  *
@@ -82,7 +82,6 @@ function loadAndSendMarkdownFile(file, response) {
 // generator: function to generate the raw HTML. Only parameter is a function that takes a completion handler that takes the raw HTML as its parameter.
 // bestRouteHandler() --> generator() to build HTML --> completion() to add to cache and send
 function baseRouteHandler(file, sender, generator) {
-    //TODO: Use the cache again
     console.log("BLAH");
     var cached = postCache.fetchFromCache(file);
     if (cached == null) {
