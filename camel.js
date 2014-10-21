@@ -18,8 +18,8 @@ app.use(express.static("public"));
 var server = http.createServer(app);
 
 var config = require('./config');
-var postFormatter = require("./PostFormatter")();
-var postCollection = require("./PostCollection")();
+var postFormatter = require("./PostFormatter");
+var postCollection = require("./PostCollection");
 var postCache = require("./PostCache");
 
 /***************************************************

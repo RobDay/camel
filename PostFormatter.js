@@ -10,11 +10,7 @@ var postCache = require('./postCache');
 var postHeaderTemplate = null;
 
 
-module.exports = function () {
-
-    var PostFormatter = {};
-    //TODO: Metadata doesn't belong here.
-    PostFormatter.siteMetadata = {};
+module.exports = (function () {
 
     //This has to move into something like a util package
     function externalFilenameForFile(file, request) {
@@ -66,7 +62,7 @@ module.exports = function () {
         // NOTE: Some metadata is added in generateHtmlAndMetadataForFile().
 
         // Merge with site default metadata
-        Object.merge(retVal, PostFormatter.siteMetadata, false, function(key, targetVal, sourceVal) {
+        Object.merge(retVal, postFormatter.siteMetadata, false, function(key, targetVal, sourceVal) {
             // Ensure that the file wins over the defaults.
             console.log('overwriting "' + sourceVal + '" with "' + targetVal);
             return targetVal;
@@ -79,11 +75,11 @@ module.exports = function () {
     // Parses the HTML and renders it.
     function parseHtml(lines, replacements, postHeader) {
         // Convert from markdown
-        var body = performMetadataReplacements(replacements, marked(lines));
+        var body = postFormatter.performMetadataReplacements(replacements, marked(lines));
         // Perform replacements
-        var header = performMetadataReplacements(replacements, PostFormatter.headerSource);
+        var header = postFormatter.performMetadataReplacements(replacements, postFormatter.headerSource);
         // Concatenate HTML
-        return header + postHeader + body + PostFormatter.footerSource;
+        return header + postHeader + body + postFormatter.footerSource;
     }
 
 
@@ -112,17 +108,58 @@ module.exports = function () {
 
 
 
+    var postFormatter = {
+        siteMetadata: {}, //TODO: Metadata could go elsewhere
+        performMetadataReplacements: function(replacements, haystack){
+            _.keys(replacements).each(function (key) {
+                // Ensure that it's a global replacement; non-regex treatment is first-only.
+                // console.log("Key: " + key + "; haystack: " + haystack);
+                haystack = haystack.replace(new RegExp(config.metadataMarker + key + config.metadataMarker, 'g'), replacements[key]);
+            });
+            return haystack;
+        },
+        generateHtmlForFile: function(file) {
+            return generateHtmlAndMetadataForFile(file)['body'];
+        },
+        generateHtmlAndMetadataForFile: function(file) {
+            var retVal = postCache.fetchFromCache(file);
+            if (retVal == undefined) {
+                console.log("Dont have a cached copy of: " + file);
+                var lines = getLinesFromPost(file);
+                var metadata = parseMetadata(lines['metadata']);
+                metadata['relativeLink'] = externalFilenameForFile(file);
+                metadata['header'] = postHeaderTemplate(metadata);
+                // If this is a post, assume a body class of 'post'.
+                if (config.postRegex.test(file)) {
+                    metadata['BodyClass'] = 'post';
+                }
+                var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
+                retVal = {
+                    metadata: metadata,
+                    body: html,
+                    unwrappedBody: postFormatter.performMetadataReplacements(metadata, generateBodyHtmlForFile(file)),
+                    file: normalizedFileName(file),
+                    date: new Date()
+                };
+                postCache.addRenderedPost(file, retVal);
+            } else {
+                console.log("Returning a cached copy of: " + file);
+            }
+            return retVal;
+        }
+    };
+
     function init() {
         loadHeaderFooter('defaultTags.html', function (data) {
             // Note this comes in as a flat string; split on newlines for parsing metadata.
-            PostFormatter.siteMetadata = parseMetadata(data.split('\n'));
+            postFormatter.siteMetadata = parseMetadata(data.split('\n'));
 
             // This relies on the above, so nest it.
             loadHeaderFooter('header.html', function (data) {
-                PostFormatter.headerSource = performMetadataReplacements(PostFormatter.siteMetadata, data);
+                postFormatter.headerSource = postFormatter.performMetadataReplacements(postFormatter.siteMetadata, data);
             });
         });
-        loadHeaderFooter('footer.html', function (data) { PostFormatter.footerSource = data; });
+        loadHeaderFooter('footer.html', function (data) { postFormatter.footerSource = data; });
         loadHeaderFooter('postHeader.html', function (data) {
             Handlebars.registerHelper('formatPostDate', function (date) {
                 return new Handlebars.SafeString(new Date(date).format('{Weekday} {Month} {d}, {yyyy} at {h}:{mm} {TT}'));
@@ -146,50 +183,7 @@ module.exports = function () {
     }
 
 
-
-    var performMetadataReplacements = PostFormatter.performMetadataReplacements = function performMetadataReplacements(replacements, haystack) {
-        _.keys(replacements).each(function (key) {
-            // Ensure that it's a global replacement; non-regex treatment is first-only.
-            // console.log("Key: " + key + "; haystack: " + haystack);
-            haystack = haystack.replace(new RegExp(config.metadataMarker + key + config.metadataMarker, 'g'), replacements[key]);
-        });
-        return haystack;
-    }
-
-    // Gets the rendered HTML for this file, with header/footer.
-    PostFormatter.generateHtmlForFile =  function generateHtmlForFile(file) {
-        return generateHtmlAndMetadataForFile(file)['body'];
-    }
-
-    // Gets the metadata & rendered HTML for this file
-    var generateHtmlAndMetadataForFile =  PostFormatter.generateHtmlAndMetadataForFile = function generateHtmlAndMetadataForFile(file) {
-        var retVal = postCache.fetchFromCache(file);
-        if (retVal == undefined) {
-            console.log("Dont have a cached copy of: " + file);
-            var lines = getLinesFromPost(file);
-            var metadata = parseMetadata(lines['metadata']);
-            metadata['relativeLink'] = externalFilenameForFile(file);
-            metadata['header'] = postHeaderTemplate(metadata);
-            // If this is a post, assume a body class of 'post'.
-            if (config.postRegex.test(file)) {
-                metadata['BodyClass'] = 'post';
-            }
-            var html =  parseHtml(lines['body'], metadata, postHeaderTemplate(metadata));
-            retVal = {
-                metadata: metadata,
-                body: html,
-                unwrappedBody: performMetadataReplacements(metadata, generateBodyHtmlForFile(file)),
-                file: normalizedFileName(file),
-                date: new Date()
-            };
-            postCache.addRenderedPost(file, retVal);
-        } else {
-            console.log("Returning a cached copy of: " + file);
-        }
-        return retVal;
-    }
-
     init();
 
-    return PostFormatter;
-}
+    return postFormatter;
+})();
