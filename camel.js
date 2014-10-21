@@ -20,6 +20,7 @@ var server = http.createServer(app);
 var config = require('./config');
 var postFormatter = require("./PostFormatter")();
 var postCollection = require("./PostCollection")();
+var postCache = require("./PostCache")();
 
 /***************************************************
  * HELPER METHODS                                  *
@@ -82,17 +83,19 @@ function loadAndSendMarkdownFile(file, response) {
 // bestRouteHandler() --> generator() to build HTML --> completion() to add to cache and send
 function baseRouteHandler(file, sender, generator) {
     //TODO: Use the cache again
-    // if (fetchFromCache(file) == null) {
+    console.log("BLAH");
+    var cached = postCache.fetchFromCache(file);
+    if (cached == null) {
         console.log('Not in cache: ' + file);
         generator(function (postData) {
             // console.log("HERE");
-            // addRenderedPostToCache(file, {body: postData});
+            postCache.addRenderedPost(file, {body: postData});
             sender({body: postData});
         });
-    // } else {
-    //     console.log('In cache: ' + file);
-    //     sender(fetchFromCache(file));
-    // }
+    } else {
+        console.log('In cache: ' + file);
+        sender(cached);
+    }
 }
 
 /***************************************************

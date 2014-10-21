@@ -5,6 +5,7 @@ var _ = require("underscore");
 
 var config = require("./config");
 var postFormatter = require("./PostFormatter")();
+var postCache = require("./PostCache")();
 var rssKey = 'rss';
 var utcOffset = 5;
 var postsPerPage = 10;
