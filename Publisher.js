@@ -1,27 +1,40 @@
-function publishPendingPosts(callback) {
-    fs.readdir(pendingPostsRoot, function (err, files){
+var config = require("./config");
+var async = require("async");
+var postFormatter = require("./PostFormatter");
+var fs = require("fs");
+var mkdirp = require("mkdirp");
+
+module.exports = function publishPendingPosts(functionCallback) {
+    fs.readdir(config.pendingPostsRoot, function (err, files){
         if(err || !files) {
-            callback(err);
+            functionCallback(err);
         } else {
             async.each(files, function (file, callback) {
 
-                var fullFilename = pendingPostsRoot + file;
-                var lines = getLinesFromPost(fullFilename);
-                var metadata = parseMetadata(lines['metadata']);
-                var pubDate = Date.create(metadata['Date']);
-                var link = postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{MM}") + '/' + pubDate.format('{dd}') + '/';
+                var fullFilename = config.pendingPostsRoot + file;
+                var parsedFile = postFormatter.generateHtmlAndMetadataForFile(fullFilename);
+                var pubDate = Date.create(parsedFile['metadata']['Date']);
+                var link = config.postsRoot + pubDate.format("{yyyy}") + '/' + pubDate.format("{MM}") + '/' + pubDate.format('{dd}') + '/';
                 mkdirp(link, function (err) {
-                    console.log("HERE" + err);
                     fs.rename(fullFilename, link + file, function (err) {
-                        console.log(err);
                         callback(err);
                     })
                 })
 
             }, function (err) {
-                callback(err);
+                functionCallback(err);
             })
 
         }
     })
+}
+
+if (require.main === module) {
+
+    setTimeout(function() {
+        module.exports(function(err) {
+            console.log("DONE");
+            process.exit(1);
+        });
+    }, 100);
 }

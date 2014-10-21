@@ -43,6 +43,8 @@ module.exports = (function () {
                         completion(data);
                     }
                 });
+            } else {
+                console.log("BLAH");
             }
         });
     }
@@ -181,7 +183,6 @@ module.exports = (function () {
               }
         });
     }
-
 
     init();
 
