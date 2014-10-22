@@ -7,32 +7,11 @@ var _ = require("underscore");
 var sugar = require("sugar");
 var config = require('./config')
 var postCache = require('./postCache');
+var tools = require("./tools")
 var postHeaderTemplate = null;
 
 
 module.exports = (function () {
-
-    //This has to move into something like a util package
-    function externalFilenameForFile(file, request) {
-        var hostname = request != undefined ? request.headers.host : '';
-
-        var retVal = hostname.length ? ('http://' + hostname) : '';
-        retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
-        retVal += file.replace('.md', '').replace(config.postsRoot, '').replace(config.postsRoot.replace('./', ''), '');
-        return retVal;
-    }
-
-    //TODO: This is a duplicate...get rid of it.
-    //It is only required for the rss nonsense because we're not  using a cache
-    function normalizedFileName(file) {
-        var retVal = file;
-        if (file.startsWith('posts')) {
-            retVal = './' + file;
-        }
-        retVal = retVal.replace('.md', '');
-
-        return retVal;
-    }
 
 
     function loadHeaderFooter(file, completion) {
@@ -44,7 +23,7 @@ module.exports = (function () {
                     }
                 });
             } else {
-                console.log("BLAH");
+
             }
         });
     }
@@ -104,7 +83,7 @@ module.exports = (function () {
         var parts = getLinesFromPost(file);
         var body = marked(parts['body']);
         var metadata = parseMetadata(parts['metadata']);
-        metadata['relativeLink'] = externalFilenameForFile(file);
+        metadata['relativeLink'] = tools.externalFilenameForFile(file);
         return body;
     }
 
@@ -121,7 +100,7 @@ module.exports = (function () {
             return haystack;
         },
         generateHtmlForFile: function(file) {
-            return generateHtmlAndMetadataForFile(file)['body'];
+            return this.generateHtmlAndMetadataForFile(file)['body'];
         },
         generateHtmlAndMetadataForFile: function(file) {
             var retVal = postCache.fetchFromCache(file);
@@ -129,7 +108,7 @@ module.exports = (function () {
                 console.log("Dont have a cached copy of: " + file);
                 var lines = getLinesFromPost(file);
                 var metadata = parseMetadata(lines['metadata']);
-                metadata['relativeLink'] = externalFilenameForFile(file);
+                metadata['relativeLink'] = tools.externalFilenameForFile(file);
                 metadata['header'] = postHeaderTemplate(metadata);
                 // If this is a post, assume a body class of 'post'.
                 if (config.postRegex.test(file)) {
@@ -140,7 +119,7 @@ module.exports = (function () {
                     metadata: metadata,
                     body: html,
                     unwrappedBody: postFormatter.performMetadataReplacements(metadata, generateBodyHtmlForFile(file)),
-                    file: normalizedFileName(file),
+                    file: tools.normalizedFileName(file),
                     date: new Date()
                 };
                 postCache.addRenderedPost(file, retVal);

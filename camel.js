@@ -21,22 +21,7 @@ var config = require('./config');
 var postFormatter = require("./PostFormatter");
 var postCollection = require("./PostCollection");
 var postCache = require("./PostCache");
-
-/***************************************************
- * HELPER METHODS                                  *
- ***************************************************/
-
-
-// Gets the external link for this file. Relative if request is
-// not specified. Absolute if request is specified.
-function externalFilenameForFile(file, request) {
-    var hostname = request != undefined ? request.headers.host : '';
-
-    var retVal = hostname.length ? ('http://' + hostname) : '';
-    retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
-    retVal += file.replace('.md', '').replace(config.postsRoot, '').replace(config.postsRoot.replace('./', ''), '');
-    return retVal;
-}
+var tools = require("./tools");
 
 
 /***************************************************
@@ -177,7 +162,7 @@ app.get('/:year/:month', function (request, response) {
                 postsByDay[dayOfMonth] = [];
             }
 
-            postsByDay[dayOfMonth].push({title: metadata['Title'], date: date, url: externalFilenameForFile(file)});
+            postsByDay[dayOfMonth].push({title: metadata['Title'], date: date, url: tools.externalFilenameForFile(file)});
          });
 
          var html = "";

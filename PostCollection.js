@@ -6,6 +6,7 @@ var _ = require("underscore");
 var config = require("./config");
 var postFormatter = require("./PostFormatter");
 var postCache = require("./PostCache");
+var tools = require("./tools");
 var rssKey = 'rss';
 var utcOffset = 5;
 var postsPerPage = 10;
@@ -13,18 +14,6 @@ var postsPerPage = 10;
 module.exports = (function() {
     //TODO: allPostsSortedGrouped needs to be in the cache
     var allPostsSortedGrouped = {};
-
-    //Duplicate
-    // Gets the external link for this file. Relative if request is
-    // not specified. Absolute if request is specified.
-    function externalFilenameForFile(file, request) {
-        var hostname = request != undefined ? request.headers.host : '';
-
-        var retVal = hostname.length ? ('http://' + hostname) : '';
-        retVal += file.at(0) == '/' && hostname.length > 0 ? '' : '/';
-        retVal += file.replace('.md', '').replace(config.postsRoot, '').replace(config.postsRoot.replace('./', ''), '');
-        return retVal;
-    }
 
 
     var postCollection = {
@@ -46,8 +35,7 @@ module.exports = (function() {
         //                +-- ...
         //                `-- (Article Object)
         allPostsSortedAndGrouped: function(completion) {
-            //TODO: Remove teh false
-            if (false && Object.size(allPostsSortedGrouped) != 0) {
+            if (Object.size(allPostsSortedGrouped) != 0) {
                 completion(allPostsSortedGrouped);
             } else {
                 qfs.listTree(config.postsRoot, function (name, stat) {
@@ -146,7 +134,7 @@ module.exports = (function() {
                         }
 
                         day['articles'].each(function (article) {
-                            retVal += '<li><a href="' + externalFilenameForFile(article['file']) + '">' + article['metadata']['Title'] + '</a></li>';
+                            retVal += '<li><a href="' + tools.externalFilenameForFile(article['file']) + '">' + article['metadata']['Title'] + '</a></li>';
                         });
                     }
                 });
@@ -158,8 +146,11 @@ module.exports = (function() {
         },
         postForFile: function(file) {
             //TODO: This needs to check the cache
-            var html = postFormatter.generateHtmlForFile(file);
-            return html;
+            var renderedFile = postCache.fetchFromCache(file);
+            if(renderedFile == undefined) {
+                renderedFile = postFormatter.generateHtmlForFile(file);
+            }
+            return renderedFile;
         },
         getRss: function (request) {
             var renderedRss = postCache.fetchFromCache(rssKey);
@@ -190,7 +181,7 @@ module.exports = (function() {
                                     title: article['metadata']['Title'],
                                     // Offset the time because Heroku's servers are GMT, whereas these dates are EST/EDT.
                                     date: new Date(article['metadata']['Date']).addHours(utcOffset),
-                                    url: externalFilenameForFile(article['file'], request),
+                                    url: tools.externalFilenameForFile(article['file'], request),
                                     description: article['unwrappedBody'].replace(/<script[\s\S]*?<\/script>/gm, "")
                                 });
                             }
